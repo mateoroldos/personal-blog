@@ -5,8 +5,9 @@ import sitemap from "@astrojs/sitemap";
 import vesper from "./src/lib/vesper.json";
 import tailwind from "@astrojs/tailwind";
 import icon from "astro-icon";
-
 import svelte from "@astrojs/svelte";
+
+import cloudflare from "@astrojs/cloudflare";
 
 // https://astro.build/config
 export default defineConfig({
@@ -15,12 +16,13 @@ export default defineConfig({
   integrations: [react(), mdx(), sitemap(), tailwind(), icon(), svelte()],
   prefetch: {
     prefetchAll: true,
-    defaultStrategy: "viewport",
+    defaultStrategy: "viewport"
   },
   markdown: {
     shikiConfig: {
       theme: vesper,
-      wrap: true,
-    },
+      wrap: true
+    }
   },
+  adapter: cloudflare()
 });
