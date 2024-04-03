@@ -61,7 +61,7 @@ else href = "/";
   <body
     class="font-primary flex min-h-screen flex-col bg-gray-100 text-sm text-gray-700 md:text-base"
   >
-    <Header client:load client:only transition:persist>
+    <Header client:load client:only="svelte" transition:persist>
       <Image
         src={avatar}
         alt="Mateo Roldos"
@@ -71,7 +71,7 @@ else href = "/";
         class="size-9 rounded-full"
       />
       <div slot="globe">
-        <CablesGlobe client:idle client:only transition:persist />
+        <CablesGlobe client:idle client:only="svelte" transition:persist />
       </div>
     </Header>
     <div class="section my-32 flex flex-1 flex-col">
