@@ -1,16 +1,76 @@
 ---
+import Base from "../layouts/Base.astro";
+import Project from "../components/Project.astro";
+import { getProjects } from "../lib/projects";
+import { getCollection } from "astro:content";
+import Link from "../components/Link";
+import PostRow from "../components/PostRow.astro";
+import { sortPostsByDate } from "../lib/date";
 
+const title = "mateor • home";
+
+const projects = await getProjects();
+const posts = sortPostsByDate(
+  (await getCollection("blog", ({ data }) => data.isDraft !== true)) ?? []
+).slice(0, 4);
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1 class="bg-red-50 font-sans">Astro</h1>
-	</body>
-</html>
+<Base {title} description="Personal website and blog of Mateo Roldos.">
+  <main class="space-y-20">
+    <section class="space-y-4">
+      <span class="text-sm font-medium text-gray-400"
+        >UI Designer & Developer from 🇺🇾 Uruguay
+      </span>
+      <p>
+        I'm <strong>Mateo</strong> and I like <strong
+          >building stuff on the web</strong
+        >.
+      </p>
+      <ul
+        class="list-inside
+        list-disc
+        space-y-2
+        text-gray-500"
+      >
+        <li>
+          Founder at <Link href="https://emestudio.xyz">eme studio</Link>.
+        </li>
+        <li>
+          Builder at <Link href="https://www.ecdao.org/">Emerald City Labs</Link
+          >.
+        </li>
+        <li>
+          Open-source maintainer at <Link href="https://app.token-base.com/"
+            >Tokenbase</Link
+          >.
+        </li>
+      </ul>
+    </section>
+
+    <section class="flex flex-col gap-4">
+      <h2 class="mb-2 text-xl">Projects</h2>
+
+      <div
+        class="flex grid-flow-row auto-rows-[1fr] flex-col gap-4 sm:grid sm:grid-cols-2"
+      >
+        {projects.map(project => <Project {project} />)}
+      </div>
+    </section>
+
+    {
+      posts.length > 0 && (
+        <section class="flex flex-col gap-4">
+          <h2 class="mb-2 text-xl">Blog</h2>
+
+          {posts.map(post => (
+            <PostRow {post} />
+          ))}
+
+          <span>
+            <Link href="/blog">All posts →</Link>
+          </span>
+        </section>
+      )
+    }
+  </main>
+</Base>

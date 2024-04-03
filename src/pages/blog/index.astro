@@ -1,0 +1,30 @@
+---
+import { getCollection } from "astro:content";
+import PostPreview from "../../components/PostPreview.astro";
+import { sortPostsByDate } from "../../lib/date";
+import Base from "../../layouts/Base.astro";
+
+const posts = sortPostsByDate(
+  (await getCollection("blog", ({ data }) => data.isDraft !== true)) ?? []
+);
+
+const title = "mateor • blog";
+---
+
+<Base {title} description="Writings on programming and technology.">
+  <main class="prose">
+    <h1>Blog</h1>
+
+    {
+      posts.length > 0 ? (
+        <div class="flex flex-col gap-12">
+          {posts.map(post => (
+            <PostPreview {post} />
+          ))}
+        </div>
+      ) : (
+        <p>No posts yet.</p>
+      )
+    }
+  </main>
+</Base>

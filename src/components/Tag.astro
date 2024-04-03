@@ -1,0 +1,31 @@
+---
+import { cn } from "../lib/cn";
+import { slugifyStr } from "../lib/slugify";
+
+type Props = {
+  tag: string;
+  isLink?: boolean;
+  class?: string;
+};
+
+const { tag, isLink = true, class: className } = Astro.props;
+
+const slugifiedTag = slugifyStr(tag);
+---
+
+<span
+  class={cn(
+    "bg-primary-100 border-2 border-solid border-primary-200 text-primary-700 w-fit font-medium text-sm rounded-md px-[0.3em]",
+    className
+  )}
+>
+  {
+    isLink ? (
+      <a href={`/tags/${slugifiedTag}`} class="no-underline">
+        #{slugifiedTag}
+      </a>
+    ) : (
+      `#${slugifiedTag}`
+    )
+  }
+</span>

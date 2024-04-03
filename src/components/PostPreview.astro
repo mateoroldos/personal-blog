@@ -1,0 +1,27 @@
+---
+import type { CollectionEntry } from "astro:content"
+import { formatDate } from "../lib/date"
+import Link from "../components/Link"
+import Tag from "./Tag.astro"
+
+type Props = {
+  post: CollectionEntry<"blog">
+}
+
+const { post: { data: { title, description, date, tags }, slug } } = Astro.props
+---
+
+<article class="flex flex-col gap-3">
+  <Link href={`/blog/${slug}`}>
+    <span class="text-lg font-semibold" transition:name={slug}>{title}</span>
+  </Link>
+
+
+  <div class="flex flex-row gap-2 flex-wrap">
+     {tags.map(tag => <Tag {tag} />)}
+  </div>
+
+  <span>{description}</span>
+
+  <span>{formatDate(date)}</span>
+</article>

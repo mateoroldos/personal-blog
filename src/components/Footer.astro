@@ -1,0 +1,73 @@
+---
+import Link from "../components/Link.tsx";
+import { Icon } from "astro-icon/components";
+---
+
+<footer class="section flex justify-between py-10">
+  <span class="font-medium text-gray-400">Mateo Roldos</span>
+
+  <div class="flex flex-row gap-4">
+    <Link href="/rss.xml">
+      <Icon
+        name="lucide:rss"
+        title="RSS"
+        class="text-neutral-400 transition-colors ease-in-out hover:text-neutral-700"
+      />
+    </Link>
+
+    <Link href="/sitemap-index.xml">
+      <Icon
+        name="lucide:network"
+        title="Sitemap"
+        class="text-neutral-400 transition-colors ease-in-out hover:text-neutral-700"
+      />
+    </Link>
+
+    <Link href="mailto:mateo@emestudio.xyz">
+      <Icon
+        name="lucide:mail"
+        title="Email"
+        class="text-neutral-400 transition-colors ease-in-out hover:text-neutral-700"
+      />
+    </Link>
+
+    <Link href="https://github.com/mateoroldos">
+      <Icon
+        name="lucide:github"
+        title="GitHub"
+        class="text-neutral-400 transition-colors ease-in-out hover:text-neutral-700"
+      />
+    </Link>
+
+    <Link href="https://www.linkedin.com/in/mr-webdev/">
+      <Icon
+        name="lucide:linkedin"
+        title="Linkedin"
+        class="text-neutral-400 transition-colors ease-in-out hover:text-neutral-700"
+      />
+    </Link>
+
+    <Link href="https://x.com/__mateor">
+      <!-- <div class="i-tabler:brand-x" title="X (formerly known as Twitter)" /> -->
+
+      <!-- temp -->
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="text-neutral-400 transition-colors ease-in-out hover:text-neutral-700"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        stroke-width="2"
+        stroke="currentColor"
+        fill="none"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <title>X (formerly known as Twitter)</title>
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+        <path d="M4 4l11.733 16h4.267l-11.733 -16z"></path>
+        <path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772"></path>
+      </svg>
+    </Link>
+  </div>
+</footer>

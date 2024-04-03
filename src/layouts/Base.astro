@@ -1,0 +1,168 @@
+---
+import { ViewTransitions } from "astro:transitions";
+import { fade } from "astro:transitions";
+import Footer from "../components/Footer.astro";
+import Header from "../components/header/Header.svelte";
+import { Image } from "astro:assets";
+import avatar from "../images/mateor-avatar.png";
+import CablesGlobe from "../components/header/globe/CablesGlobe.svelte";
+import { writable } from "svelte/store";
+
+type Props = {
+  title: string;
+  description: string;
+  image?: string;
+};
+
+const { pathname, origin } = Astro.url;
+const { title, description, image = `${origin}/mateor-og.jpg` } = Astro.props;
+
+let href = "hi";
+
+if (pathname === "/blog" || pathname === "/blog/") href = "/";
+else if (pathname.startsWith("/blog/")) href = "/blog";
+else href = "/";
+---
+
+<html lang="en">
+  <head>
+    <ViewTransitions transition:animate={fade({ duration: "0.2s" })} />
+
+    <!-- global metadata -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="icon" href="/mateor-avatar.svg" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- primary meta tags -->
+    <title>{title}</title>
+    <meta name="title" content={title} />
+    <meta name="description" content={description} />
+
+    <!-- open graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Mateo Roldos" />
+    <meta property="og:url" content={Astro.url} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={image} />
+
+    <!-- twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={Astro.url} />
+    <meta property="twitter:title" content={title} />
+    <meta property="twitter:description" content={description} />
+    <meta property="twitter:image" content={image} />
+
+    <!-- link tags -->
+    <link rel="sitemap" href="/sitemap-index.xml" />
+  </head>
+
+  <body
+    class="font-primary flex min-h-screen flex-col bg-gray-100 text-sm text-gray-700 md:text-base"
+  >
+    <Header client:load client:only transition:persist>
+      <Image
+        src={avatar}
+        alt="Mateo Roldos"
+        slot="avatar"
+        width="72"
+        height="72"
+        class="size-9 rounded-full"
+      />
+      <div slot="globe">
+        <CablesGlobe client:idle client:only transition:persist />
+      </div>
+    </Header>
+    <div class="section my-32 flex flex-1 flex-col">
+      <slot />
+    </div>
+    <Footer />
+
+    <style is:global>
+      html {
+        @apply touch-manipulation scroll-smooth antialiased;
+        text-rendering: optimizeLegibility;
+      }
+
+      ::-webkit-scrollbar {
+        @apply w-2;
+      }
+
+      /* Track */
+      ::-webkit-scrollbar-track {
+        @apply bg-transparent;
+      }
+
+      /* Handle */
+      ::-webkit-scrollbar-thumb {
+        @apply rounded-md bg-gray-400 transition-all duration-700 ease-in-out;
+      }
+
+      /* Handle on hover */
+      ::-webkit-scrollbar-thumb:hover {
+        @apply bg-gray-500;
+      }
+
+      .section {
+        @apply mx-auto w-[90%] max-w-container;
+      }
+
+      * {
+        @apply selection:bg-primary-200 selection:text-gray-900;
+      }
+
+      strong {
+        @apply font-semibold text-gray-950;
+      }
+
+      & h1,
+      & h2,
+      & h3 {
+        @apply font-semibold text-gray-950;
+      }
+
+      hr {
+        @apply border-gray-200;
+      }
+
+      .prose {
+        @apply max-w-container [&>:not(:last-child)]:mb-6;
+
+        & p {
+          @apply my-6 leading-6;
+        }
+
+        & h1,
+        & h2,
+        & h3 {
+          @apply my-8 font-semibold text-gray-950;
+        }
+
+        & h1 {
+          @apply text-2xl;
+        }
+
+        & h2 {
+          @apply text-xl;
+        }
+
+        & h3 {
+          @apply text-lg;
+        }
+
+        & ul {
+          @apply list-outside list-disc pl-4;
+        }
+
+        & ul > li {
+          @apply mb-2;
+        }
+
+        & img {
+          @apply mx-auto my-6 rounded;
+        }
+      }
+    </style>
+  </body>
+</html>

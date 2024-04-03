@@ -1,0 +1,71 @@
+---
+import { getCollection } from "astro:content";
+import getUniqueTags, {
+  getPostsByTag,
+  getProjectsByTag,
+} from "../../../lib/tags";
+import { getProjects } from "../../../lib/projects";
+import PostPreview from "../../../components/PostPreview.astro";
+import Project from "../../../components/Project.astro";
+import Base from "../../../layouts/Base.astro";
+import { slugifyStr } from "../../../lib/slugify";
+
+export async function getStaticPaths() {
+  const posts = (await getCollection("blog")) ?? [];
+  const projects = (await getProjects()) ?? [];
+
+  const tags = getUniqueTags(posts, projects);
+
+  return tags.map(tag => {
+    return {
+      params: { tag },
+      props: { tag, posts, projects },
+    };
+  });
+}
+
+const { tag, posts, projects } = Astro.props;
+
+const postsByTag = getPostsByTag(posts, tag);
+const projectsByTag = getProjectsByTag(projects, tag);
+
+const title = `Posts tagged ${tag}`;
+
+const slugifiedTag = slugifyStr(tag);
+---
+
+<Base {title} description=`A collection of posts tagged with ${tag}`>
+  <main class="prose">
+    <h1 transition:name={slugifiedTag}>#{tag}</h1>
+
+    <div class="my-10"></div>
+
+    {
+      projectsByTag.length > 0 && (
+        <>
+          <h2>Projects</h2>
+          <div class="grid grid-cols-2 gap-4 md:grid-cols-3">
+            {projectsByTag.map(project => (
+              <Project {project} />
+            ))}
+          </div>
+        </>
+      )
+    }
+
+    <div class="my-10"></div>
+
+    {
+      postsByTag.length > 0 && (
+        <>
+          <h2>Posts</h2>
+          <div class="flex flex-col gap-12">
+            {postsByTag.map(post => (
+              <PostPreview {post} />
+            ))}
+          </div>
+        </>
+      )
+    }
+  </main>
+</Base>
