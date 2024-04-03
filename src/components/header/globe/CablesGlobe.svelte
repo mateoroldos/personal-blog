@@ -25,21 +25,22 @@
     globe.controls().enableZoom = false;
     globe.controls().enablePan = false;
 
+    setTimeout(() => {
+      globe
+        .pathsData(cablesPaths)
+        .pathPoints("coords")
+        .pathPointLat(p => p[1])
+        .pathPointLng(p => p[0])
+        .pathColor(() => colors.gray[700])
+        .pathDashLength(0.1)
+        .pathDashGap(0.008)
+        .pathDashAnimateTime(22000)
+        .pathTransitionDuration(7000);
+    }, 1000);
+
     sendingMessage.subscribe(isSending => {
       if (isSending) {
         globe.controls().autoRotateSpeed = 10;
-        // setTimeout(() => {
-        //   globe
-        //     .pathsData(cablesPaths)
-        //     .pathPoints("coords")
-        //     .pathPointLat(p => p[1])
-        //     .pathPointLng(p => p[0])
-        //     .pathColor(() => colors.gray[800])
-        //     .pathDashLength(0.1)
-        //     .pathDashGap(0.008)
-        //     .pathDashAnimateTime(22000)
-        //     .pathTransitionDuration(7000);
-        // }, 1000);
       } else {
         globe.controls().autoRotateSpeed = 0.4;
       }
