@@ -1,6 +1,8 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
 
+export const prerender = false;
+
 export const POST: APIRoute = async ({ request }) => {
   const data = await request.formData();
   const email = data.get("email");
@@ -25,28 +27,28 @@ export const POST: APIRoute = async ({ request }) => {
 
   const RESEND_API_KEY = import.meta.env.RESEND_API_KEY;
 
-  // const response = await fetch("https://api.resend.com/emails", {
-  //   method: "POST",
-  //   headers: {
-  //     "Content-Type": "application/json",
-  //     Authorization: `Bearer ${RESEND_API_KEY}`,
-  //   },
-  //   body: JSON.stringify({
-  //     from: "onboarding@resend.dev",
-  //     to: "mateo@emestudio.xyz",
-  //     subject: "Message from personal site",
-  //     html: `${email}: ${message}`,
-  //   }),
-  // });
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${RESEND_API_KEY}`,
+    },
+    body: JSON.stringify({
+      from: "onboarding@resend.dev",
+      to: "mateo@emestudio.xyz",
+      subject: "Message from personal site",
+      html: `${email}: ${message}`,
+    }),
+  });
 
-  // if (!response.ok) {
-  //   return new Response(
-  //     JSON.stringify({
-  //       message: "Failed to send email",
-  //     }),
-  //     { status: 500 }
-  //   );
-  // }
+  if (!response.ok) {
+    return new Response(
+      JSON.stringify({
+        message: "Failed to send email",
+      }),
+      { status: 500 }
+    );
+  }
 
   return new Response(
     JSON.stringify({
