@@ -1,8 +1,12 @@
+import { JSX } from 'solid-js';
+
 interface LinkProps {
   href: string;
+  children: JSX.Element;
 }
 
-function Link({ href, children }: React.PropsWithChildren<LinkProps>) {
+function Link(props: LinkProps) {
+  const { href, children } = props;
   const isExternal = href.startsWith("http");
 
   return (

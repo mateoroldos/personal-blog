@@ -4,6 +4,6 @@
 
 - Astro
 - Svelte
-- React
+- Solid
 - Tailwind
 - Globe.gl

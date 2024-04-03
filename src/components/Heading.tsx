@@ -1,19 +1,27 @@
-import React from 'react';
+import { Show, splitProps } from "solid-js";
+import type { JSX } from "solid-js/jsx-runtime";
+import { Dynamic } from "solid-js/web";
 
-export type HeadingLevel = 'h1' | 'h2' | 'h3';
+export type HeadingLevel = "h1" | "h2" | "h3";
 
 export type HeadingProps = {
   level: HeadingLevel;
-} & React.HTMLAttributes<HTMLHeadingElement>;
+} & JSX.HTMLAttributes<HTMLHeadingElement>;
 
 export function Heading(props: HeadingProps) {
-  const { level, children, ...rest } = props;
+  const [own, rest] = splitProps(props, ["level", "children"]);
 
-  const Component = level;
-
-  return <Component {...rest}>{rest.id ? <a href={`#${rest.id}`}>{children}</a> : children}</Component>;
+  return (
+    <Dynamic<HeadingLevel> component={own.level} {...rest}>
+      <Show when={rest.id} fallback={own.children}>
+        <a href={`#${rest.id!}`}>{own.children}</a>
+      </Show>
+    </Dynamic>
+  );
 }
 
 export function createHeading(level: HeadingLevel) {
-  return (props: Omit<HeadingProps, 'level'>) => <Heading level={level} {...props} />;
+  return (props: Omit<HeadingProps, "level">) => (
+    <Heading level={level} {...props} />
+  );
 }
