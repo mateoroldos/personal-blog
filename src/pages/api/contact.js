@@ -1,12 +1,9 @@
-import type { APIRoute } from "astro";
 import { z } from "zod";
 
 export const prerender = false;
 
-export const POST: APIRoute = async ({ request, locals }) => {
-  const runtime = locals.runtime;
-
-  const data = await request.formData();
+export const POST = async context => {
+  const data = await context.request.formData();
   const email = data.get("email");
   const message = data.get("message");
 
@@ -27,9 +24,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
     );
   }
 
-  const RESEND_API_KEY = runtime
-    ? runtime.env.RESEND_API_KEY
-    : import.meta.env.RESEND_API_KEY;
+  const RESEND_API_KEY = import.meta.env.DEV
+    ? import.meta.env.RESEND_API_KEY
+    : context.locals.runtime.env.RESEND_API_KEY;
 
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -46,8 +43,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
   });
 
   if (!response.ok) {
-    console.error(await response.text());
-
     return new Response(
       JSON.stringify({
         message: "Failed to send email",
