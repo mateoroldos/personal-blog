@@ -3,7 +3,9 @@ import { z } from "zod";
 
 export const prerender = false;
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
+  const runtime = locals.runtime;
+
   const data = await request.formData();
   const email = data.get("email");
   const message = data.get("message");
@@ -25,7 +27,9 @@ export const POST: APIRoute = async ({ request }) => {
     );
   }
 
-  const RESEND_API_KEY = import.meta.env.RESEND_API_KEY;
+  const RESEND_API_KEY = runtime
+    ? runtime.env.RESEND_API_KEY
+    : import.meta.env.RESEND_API_KEY;
 
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
