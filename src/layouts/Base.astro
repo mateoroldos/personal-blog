@@ -27,6 +27,21 @@ else href = "/";
   <head>
     <ViewTransitions transition:animate={fade({ duration: "0.2s" })} />
 
+    <!-- Google Tag Manager -->
+    <script type="text/partytown">
+      (function (w, d, s, l, i) {
+        w[l] = w[l] || [];
+        w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
+        var f = d.getElementsByTagName(s)[0],
+          j = d.createElement(s),
+          dl = l != "dataLayer" ? "&l=" + l : "";
+        j.async = true;
+        j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
+        f.parentNode.insertBefore(j, f);
+      })(window, document, "script", "dataLayer", "GTM-MWJ6FCFP");
+    </script>
+    <!-- End Google Tag Manager -->
+
     <!-- global metadata -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -60,6 +75,16 @@ else href = "/";
   <body
     class="font-primary flex min-h-screen flex-col bg-gray-100 text-sm text-gray-700 md:text-base"
   >
+    <!-- Google Tag Manager (noscript) -->
+    <noscript
+      ><iframe
+        src="https://www.googletagmanager.com/ns.html?id=GTM-MWJ6FCFP"
+        height="0"
+        width="0"
+        style="display:none;visibility:hidden"></iframe></noscript
+    >
+    <!-- End Google Tag Manager (noscript) -->
+
     <Header client:load client:only="svelte" transition:persist>
       <Image
         src={avatar}

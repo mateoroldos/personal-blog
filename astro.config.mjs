@@ -6,23 +6,35 @@ import tailwind from "@astrojs/tailwind";
 import icon from "astro-icon";
 import svelte from "@astrojs/svelte";
 import cloudflare from "@astrojs/cloudflare";
-
+import partytown from "@astrojs/partytown";
 import solidJs from "@astrojs/solid-js";
 
 // https://astro.build/config
 export default defineConfig({
   site: "https://mateor.xyz",
   output: "hybrid",
-  integrations: [mdx(), sitemap(), tailwind(), icon(), svelte(), solidJs()],
+  integrations: [
+    mdx(),
+    sitemap(),
+    tailwind(),
+    icon(),
+    svelte(),
+    solidJs(),
+    partytown({
+      config: {
+        forward: ["dataLayer.push"],
+      },
+    }),
+  ],
   prefetch: {
     prefetchAll: true,
-    defaultStrategy: "viewport"
+    defaultStrategy: "viewport",
   },
   markdown: {
     shikiConfig: {
       theme: vesper,
-      wrap: true
-    }
+      wrap: true,
+    },
   },
-  adapter: cloudflare()
+  adapter: cloudflare(),
 });
