@@ -1,7 +1,6 @@
 <script lang="ts">
   import { isOpen } from "./../isOpen.ts";
   import { fade } from "svelte/transition";
-  import { cablesPaths } from "./cablesPaths";
   import type { Action } from "svelte/action";
   import Globe from "globe.gl";
   import type { Writable } from "svelte/store";
@@ -18,7 +17,7 @@
       .globeImageUrl("//unpkg.com/three-globe/example/img/earth-dark.jpg")
       .bumpImageUrl("//unpkg.com/three-globe/example/img/earth-topology.png")
       .backgroundColor("rgba(0,0,0,0)")
-      .atmosphereColor(colors.orange[700])(node);
+      .atmosphereColor(colors.orange[600])(node);
 
     globe.controls().autoRotate = true;
     globe.controls().autoRotateSpeed = 0.4;

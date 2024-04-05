@@ -121,7 +121,7 @@
       duration: 1600,
       easing: quintOut,
     }}
-    class="fixed inset-0 z-40 bg-black p-6"
+    class="fixed inset-0 z-40 bg-gray-950 p-6"
   >
     <slot name="globe" />
     <div
