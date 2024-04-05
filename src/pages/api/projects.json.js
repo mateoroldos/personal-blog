@@ -10,7 +10,7 @@ export const GET = async () => {
 
       return {
         ...project,
-        stars: data.stargazers_count,
+        stars: data.stargazers_count ?? 0,
       };
     });
 
