@@ -1,47 +1,69 @@
 import { z } from "astro:content";
 
 const projectSchema = z.object({
+  name: z.string(),
+  user: z.string(),
   repo: z.string(),
-  link: z.string(),
   description: z.string(),
   tags: z.array(z.string()),
 });
 
 export type Project = z.infer<typeof projectSchema>;
+export type ProjectWithStars = Project & { stars: number };
 
 const projects: Project[] = [
   {
+    name: "project-toucans-v2",
     repo: "project-toucans",
-    link: "/emerald-dao/project-toucans-v2",
+    user: "emerald-dao",
     description: "Create and manage DAOs on the Flow Blockchain.",
     tags: ["Svelte", "TypeScript", "Flow"],
   },
   {
+    name: "tokenbase",
     repo: "tokenbase",
-    link: "/mateoroldos/tokenbase",
+    user: "mateoroldos",
     description: "Create, manage and export design tokens.",
     tags: ["Svelte", "TypeScript", "Tailwind CSS"],
   },
   {
-    repo: "floats",
-    link: "/emerald-dao/float",
+    name: "floats",
+    repo: "float",
+    user: "emerald-dao/float",
     description: "Flow proof of attendance dapp.",
     tags: ["Svelte", "TypeScript", "Flow"],
   },
   {
+    name: "personal-blog",
     repo: "personal-blog",
-    link: "/mateoroldos/personal-blog",
+    user: "mateoroldos",
     description: "Cool personal site.",
     tags: ["Astro", "Svelte", "TypeScript", "Tailwind"],
   },
   {
-    repo: "emerald-academy",
-    link: "/emerald-dao/emerald-academy-v2",
+    name: "emerald-academy",
+    repo: "emerald-academy-v2",
+    user: "emerald-dao",
     description: "A platform for learning about the Flow Blockchain ecosystem.",
     tags: ["Svelte", "TypeScript", "Flow"],
   },
 ];
 
-export async function getProjects(): Promise<Project[]> {
-  return projects;
-}
+export const GET = async () => {
+  const getProjectsWithStars = () =>
+    projects.map(async project => {
+      const response = await fetch(
+        `https://api.github.com/repos/${project.user}/${project.repo}`
+      );
+      const data = await response.json();
+
+      return {
+        ...project,
+        stars: data.stargazers_count,
+      };
+    });
+
+  const projectsWithStars = await Promise.all(getProjectsWithStars());
+
+  return new Response(JSON.stringify(projectsWithStars));
+};

@@ -1,25 +1,25 @@
 ---
-import type { Project } from "../lib/projects";
+import type { ProjectWithStars } from "../pages/api/projects.json";
 import GithubStars from "./GithubStars.svelte";
 import Tag from "./Tag.astro";
 
 type Props = {
-  project: Project;
+  project: ProjectWithStars;
 };
 
 const {
-  project: { repo: name, description, link, tags },
+  project: { repo, description, name, user, tags, stars },
 } = Astro.props;
 ---
 
 <a
   class="flex flex-col justify-between gap-6 rounded-xl border-2 border-gray-200 bg-gray-50 p-4 no-underline transition-colors ease-in-out hover:bg-white"
-  href={`https://github.com${link}`}
+  href={`https://github.com/${user}/${repo}`}
 >
   <div class="flex flex-col space-y-1">
     <div class="flex flex-row items-center justify-between gap-8">
       <span class="font-semibold text-gray-900">{name}</span>
-      <GithubStars client:idle {link} />
+      <GithubStars client:idle {stars} />
     </div>
     <span class="text-sm text-gray-600">{description}</span>
   </div>

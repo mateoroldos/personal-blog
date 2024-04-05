@@ -1,19 +1,11 @@
 <script lang="ts">
-  import { onMount } from "svelte";
   import { tweened, type Tweened } from "svelte/motion";
   import { Star } from "lucide-svelte";
 
-  export let link: string;
+  export let stars: number;
 
-  let stars: Tweened<number> = tweened(0, { duration: 2000 });
-
-  onMount(async () => {
-    const githubStars = await fetch(`https://api.github.com/repos${link}`)
-      .then(res => res.json())
-      .then(data => data.stargazers_count);
-
-    stars.set(githubStars);
-  });
+  let starsStore: Tweened<number> = tweened(0, { duration: 2000 });
+  starsStore.set(stars);
 </script>
 
 <div
@@ -21,6 +13,6 @@
 >
   <Star class="w-3 text-primary-600" />
   <div class="flex items-center justify-center flex-1">
-    <span>{Math.trunc($stars)}</span>
+    <span>{Math.trunc($starsStore)}</span>
   </div>
 </div>

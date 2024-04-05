@@ -1,15 +1,19 @@
 ---
 import Base from "../layouts/Base.astro";
 import Project from "../components/Project.astro";
-import { getProjects } from "../lib/projects";
 import { getCollection } from "astro:content";
 import Link from "../components/Link";
 import PostRow from "../components/PostRow.astro";
 import { sortPostsByDate } from "../lib/date";
+import type { ProjectWithStars } from "./api/projects.json";
 
 const title = "mateor • home";
 
-const projects = await getProjects();
+const projectsResponse = await fetch(`${Astro.url.origin}/api/projects.json`);
+const projects: ProjectWithStars[] = await projectsResponse.json();
+
+console.log(projects);
+
 const posts = sortPostsByDate(
   (await getCollection("blog", ({ data }) => data.isDraft !== true)) ?? []
 ).slice(0, 4);
