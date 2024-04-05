@@ -31,7 +31,7 @@ export const projects: Project[] = [
   {
     name: "floats",
     repo: "float",
-    user: "emerald-dao/float",
+    user: "emerald-dao",
     description: "Flow proof of attendance dapp.",
     tags: ["Svelte", "TypeScript", "Flow"],
     stars: undefined,
