@@ -1,21 +1,29 @@
 ---
-import type { Project } from "../lib/projects"
-import Tag from "./Tag.astro"
+import type { Project } from "../lib/projects";
+import GithubStars from "./GithubStars.svelte";
+import Tag from "./Tag.astro";
 
 type Props = {
-  project: Project
-}
+  project: Project;
+};
 
-const { project: { repo: name, description, link, tags } } = Astro.props
+const {
+  project: { repo: name, description, link, tags },
+} = Astro.props;
 ---
 
-<a class="max-w-30ch flex flex-col gap-6 justify-between border-2 border-gray-200 rounded-xl p-4 no-underline bg-gray-50 hover:bg-white transition-colors ease-in-out" href={link}>
+<a
+  class="flex flex-col justify-between gap-6 rounded-xl border-2 border-gray-200 bg-gray-50 p-4 no-underline transition-colors ease-in-out hover:bg-white"
+  href={`https://github.com${link}`}
+>
   <div class="flex flex-col space-y-1">
-    <span class="font-semibold text-gray-900">{name}</span>
+    <div class="flex flex-row items-center justify-between gap-8">
+      <span class="font-semibold text-gray-900">{name}</span>
+      <GithubStars client:idle {link} />
+    </div>
     <span class="text-sm text-gray-600">{description}</span>
   </div>
-
-  <div class="flex flex-row gap-2 flex-wrap-reverse">
+  <div class="flex flex-row flex-wrap-reverse gap-2">
     {tags.map(tag => <Tag {tag} isLink={false} />)}
   </div>
 </a>

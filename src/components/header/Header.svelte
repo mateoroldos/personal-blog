@@ -38,7 +38,7 @@
 
 {#if !messageSent && visible}
   <header
-    class="z-50 w-[370px] border border-solid border-neutral-600 flex flex-col align-start justify-start space-y-4 overflow-hidden shadow-xl inset-x-0 bg-gray-700 left-[50vw] -translate-x-1/2 p-[6px] rounded-3xl text-gray-200 fixed top-5 transition-[max-height,_transform,_opacity] ease-in-out duration-700"
+    class="z-50 w-[370px] border border-solid border-gray-600 flex flex-col align-start justify-start space-y-4 overflow-hidden shadow-xl inset-x-0 bg-gray-700 left-[50vw] -translate-x-1/2 p-[6px] rounded-3xl text-gray-200 fixed top-5 transition-[max-height,_transform,_opacity] ease-in-out duration-700"
     class:translate-y-[100px]={$isOpen}
     in:fly|local={{ duration: 600, delay: 600, easing: quintOut, y: -100 }}
     out:scale={{ duration: 1200, easing: quintOut }}
