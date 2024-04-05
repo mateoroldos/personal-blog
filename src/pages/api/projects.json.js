@@ -16,5 +16,10 @@ export const GET = async () => {
 
   const projectsWithStars = await Promise.all(getProjectsWithStars());
 
-  return new Response(JSON.stringify(projectsWithStars));
+  return new Response(JSON.stringify(projectsWithStars), {
+    status: 200,
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
 };
