@@ -12,8 +12,6 @@ const title = "mateor • home";
 const projectsResponse = await fetch(`${Astro.url.origin}/api/projects.json`);
 const projects: ProjectWithStars[] = await projectsResponse.json();
 
-console.log(projects);
-
 const posts = sortPostsByDate(
   (await getCollection("blog", ({ data }) => data.isDraft !== true)) ?? []
 ).slice(0, 4);
