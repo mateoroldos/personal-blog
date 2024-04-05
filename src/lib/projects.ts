@@ -11,7 +11,7 @@ const projectSchema = z.object({
 export type Project = z.infer<typeof projectSchema>;
 export type ProjectWithStars = Project & { stars: number };
 
-const projects: Project[] = [
+export const projects: Project[] = [
   {
     name: "project-toucans-v2",
     repo: "project-toucans",
@@ -48,22 +48,3 @@ const projects: Project[] = [
     tags: ["Svelte", "TypeScript", "Flow"],
   },
 ];
-
-export const GET = async () => {
-  const getProjectsWithStars = () =>
-    projects.map(async project => {
-      const response = await fetch(
-        `https://api.github.com/repos/${project.user}/${project.repo}`
-      );
-      const data = await response.json();
-
-      return {
-        ...project,
-        stars: data.stargazers_count,
-      };
-    });
-
-  const projectsWithStars = await Promise.all(getProjectsWithStars());
-
-  return new Response(JSON.stringify(projectsWithStars));
-};

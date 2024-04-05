@@ -5,11 +5,11 @@ import { getCollection } from "astro:content";
 import Link from "../components/Link";
 import PostRow from "../components/PostRow.astro";
 import { sortPostsByDate } from "../lib/date";
-import type { ProjectWithStars } from "./api/projects.json";
+import type { ProjectWithStars } from "../lib/projects";
 
 const title = "mateor • home";
 
-const projectsResponse = await fetch(`${Astro.url.origin}/api/projects.json`);
+const projectsResponse = await fetch(Astro.url + "/api/projects.json");
 const projects: ProjectWithStars[] = await projectsResponse.json();
 
 const posts = sortPostsByDate(
@@ -76,3 +76,4 @@ const posts = sortPostsByDate(
     }
   </main>
 </Base>
+./api/projects.json.jss
