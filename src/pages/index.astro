@@ -5,12 +5,18 @@ import { getCollection } from "astro:content";
 import Link from "../components/Link";
 import PostRow from "../components/PostRow.astro";
 import { sortPostsByDate } from "../lib/date";
-import type { ProjectWithStars } from "../lib/projects";
+import { projects } from "../lib/projects";
 
 const title = "mateor • home";
 
-const projectsResponse = await fetch(Astro.url + "/api/projects.json");
-const projects: ProjectWithStars[] = await projectsResponse.json();
+projects.map(async project => {
+  project.stars = await fetch(
+    `https://api.github.com/repos/${project.user}/${project.repo}`
+  )
+    .then(res => res.json())
+    .then(data => data.stargazers_count || 0);
+  return project;
+});
 
 const posts = sortPostsByDate(
   (await getCollection("blog", ({ data }) => data.isDraft !== true)) ?? []

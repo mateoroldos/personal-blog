@@ -6,10 +6,10 @@ const projectSchema = z.object({
   repo: z.string(),
   description: z.string(),
   tags: z.array(z.string()),
+  stars: z.number().optional(),
 });
 
 export type Project = z.infer<typeof projectSchema>;
-export type ProjectWithStars = Project & { stars: number };
 
 export const projects: Project[] = [
   {
@@ -18,6 +18,7 @@ export const projects: Project[] = [
     user: "emerald-dao",
     description: "Create and manage DAOs on the Flow Blockchain.",
     tags: ["Svelte", "TypeScript", "Flow"],
+    stars: undefined,
   },
   {
     name: "tokenbase",
@@ -25,6 +26,7 @@ export const projects: Project[] = [
     user: "mateoroldos",
     description: "Create, manage and export design tokens.",
     tags: ["Svelte", "TypeScript", "Tailwind CSS"],
+    stars: undefined,
   },
   {
     name: "floats",
@@ -32,6 +34,7 @@ export const projects: Project[] = [
     user: "emerald-dao/float",
     description: "Flow proof of attendance dapp.",
     tags: ["Svelte", "TypeScript", "Flow"],
+    stars: undefined,
   },
   {
     name: "personal-blog",
@@ -39,6 +42,7 @@ export const projects: Project[] = [
     user: "mateoroldos",
     description: "Cool personal site.",
     tags: ["Astro", "Svelte", "TypeScript", "Tailwind"],
+    stars: undefined,
   },
   {
     name: "emerald-academy",
@@ -46,5 +50,6 @@ export const projects: Project[] = [
     user: "emerald-dao",
     description: "A platform for learning about the Flow Blockchain ecosystem.",
     tags: ["Svelte", "TypeScript", "Flow"],
+    stars: undefined,
   },
 ];
