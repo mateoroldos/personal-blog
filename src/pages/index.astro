@@ -9,7 +9,7 @@ import { projects } from "../lib/projects";
 
 const title = "mateor • home";
 
-projects.map(async project => {
+const getProjectsWithStars = projects.map(async project => {
   project.stars = await fetch(
     `https://api.github.com/repos/${project.user}/${project.repo}`
   )
@@ -17,6 +17,8 @@ projects.map(async project => {
     .then(data => data.stargazers_count || undefined);
   return project;
 });
+
+const projectsWithStars = await Promise.all(getProjectsWithStars);
 
 const posts = sortPostsByDate(
   (await getCollection("blog", ({ data }) => data.isDraft !== true)) ?? []
@@ -61,7 +63,7 @@ const posts = sortPostsByDate(
       <div
         class="flex grid-flow-row auto-rows-[1fr] flex-col gap-4 sm:grid sm:grid-cols-2"
       >
-        {projects.map(project => <Project {project} />)}
+        {projectsWithStars.map(project => <Project {project} />)}
       </div>
     </section>
 
