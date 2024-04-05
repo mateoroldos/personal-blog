@@ -13,8 +13,8 @@ export type Project = z.infer<typeof projectSchema>;
 
 export const projects: Project[] = [
   {
-    name: "project-toucans-v2",
-    repo: "project-toucans",
+    name: "project-toucans",
+    repo: "project-toucans-v2",
     user: "emerald-dao",
     description: "Create and manage DAOs on the Flow Blockchain.",
     tags: ["Svelte", "TypeScript", "Flow"],
