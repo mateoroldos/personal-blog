@@ -98,7 +98,7 @@ else href = "/";
         <CablesGlobe client:idle client:only="svelte" transition:persist />
       </div>
     </Header>
-    <div class="section my-36 flex flex-1 flex-col">
+    <div class="section my-20 flex flex-1 flex-col">
       <slot />
     </div>
     <Footer />
@@ -137,7 +137,7 @@ else href = "/";
       }
 
       strong {
-        @apply font-semibold text-gray-950;
+        @apply font-bold text-gray-950;
       }
 
       & h1,
@@ -151,11 +151,7 @@ else href = "/";
       }
 
       .prose {
-        @apply max-w-container [&>:not(:last-child)]:mb-6;
-
-        & p {
-          @apply my-6 leading-6;
-        }
+        @apply max-w-container text-[0.95rem] [&>:not(:last-child)]:mb-6;
 
         & h1,
         & h2,
@@ -173,14 +169,6 @@ else href = "/";
 
         & h3 {
           @apply text-lg;
-        }
-
-        & ul {
-          @apply list-outside list-disc pl-4;
-        }
-
-        & ul > li {
-          @apply mb-2;
         }
 
         & img {
