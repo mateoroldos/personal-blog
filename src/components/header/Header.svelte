@@ -9,9 +9,10 @@
   import LocaleTime from "./atoms/LocaleTime.svelte";
   import { onMount } from "svelte";
   import { Check, Copy } from "lucide-svelte";
+  import OptionalLink from "./atoms/OptionalLink.svelte";
 
-  let messageSent = false;
   let visible = false;
+  let messageSent = false;
   let isEmailCopied = false;
 
   const handleCopyEmail = () => {
@@ -23,13 +24,15 @@
     }, 2000);
   };
 
-  isOpen.subscribe(value => {
-    if (value) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
-    }
-  });
+  const updateOverflow = (node: HTMLElement) => {
+    isOpen.subscribe(value => {
+      if (value) {
+        node.style.overflow = "hidden";
+      } else {
+        node.style.overflow = "auto";
+      }
+    });
+  };
 
   onMount(() => {
     visible = true;
@@ -40,13 +43,23 @@
   <header
     class="z-50 w-[370px] border border-solid border-gray-600 flex flex-col align-start justify-start space-y-4 overflow-hidden shadow-xl inset-x-0 bg-gray-700 left-[50vw] -translate-x-1/2 p-[6px] rounded-3xl text-gray-200 fixed top-5 transition-[max-height,_transform,_opacity] ease-in-out duration-700"
     class:translate-y-[100px]={$isOpen}
-    in:fly|local={{ duration: 600, delay: 600, easing: quintOut, y: -100 }}
+    use:updateOverflow
+    in:fly={{
+      duration: 600,
+      delay: 600,
+      easing: quintOut,
+      y: -100,
+    }}
     out:scale|local={{ duration: 1200, easing: quintOut }}
   >
     <div
       class="flex flex-row justify-between items-center md:gap-14 gap-6 flex-1 overflow-hidden relative"
     >
-      <a href="/" class="flex flex-row items-center overflow-hidden">
+      <OptionalLink
+        isLink={!$isOpen}
+        href="/"
+        class="flex flex-row items-center overflow-hidden"
+      >
         <slot name="avatar" />
         <h1 class="hidden sm:block text-gray-50 font-medium ml-2">mateor</h1>
         {#if $isOpen}
@@ -86,7 +99,7 @@
             </button>
           </div>
         {/if}
-      </a>
+      </OptionalLink>
 
       <!-- {#if !$isOpen}
         <Navbar />

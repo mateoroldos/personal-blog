@@ -1,6 +1,5 @@
 ---
-import { ViewTransitions } from "astro:transitions";
-import { fade } from "astro:transitions";
+import { ViewTransitions, fade } from "astro:transitions";
 import Footer from "../components/Footer.astro";
 import Header from "../components/header/Header.svelte";
 import { Image } from "astro:assets";
@@ -13,19 +12,13 @@ type Props = {
   image?: string;
 };
 
-const { pathname, origin } = Astro.url;
+const { origin } = Astro.url;
 const { title, description, image = `${origin}/mateor-og.jpg` } = Astro.props;
-
-let href = "hi";
-
-if (pathname === "/blog" || pathname === "/blog/") href = "/";
-else if (pathname.startsWith("/blog/")) href = "/blog";
-else href = "/";
 ---
 
 <html lang="en">
   <head>
-    <ViewTransitions transition:animate={fade({ duration: "0.2s" })} />
+    <ViewTransitions />
 
     <!-- Google Tag Manager -->
     <script type="text/partytown">
@@ -85,19 +78,21 @@ else href = "/";
     >
     <!-- End Google Tag Manager (noscript) -->
 
-    <Header client:load client:only="svelte" transition:persist>
-      <Image
-        src={avatar}
-        alt="Mateo Roldos"
-        slot="avatar"
-        width="72"
-        height="72"
-        class="size-9 rounded-full"
-      />
-      <div slot="globe">
-        <CablesGlobe client:idle client:only="svelte" transition:persist />
-      </div>
-    </Header>
+    <div transition:persist>
+      <Header client:load client:only="svelte">
+        <Image
+          src={avatar}
+          alt="Mateo Roldos"
+          slot="avatar"
+          width="72"
+          height="72"
+          class="size-9 rounded-full"
+        />
+        <div slot="globe">
+          <CablesGlobe client:idle client:only="svelte" />
+        </div>
+      </Header>
+    </div>
     <div class="section my-20 flex flex-1 flex-col">
       <slot />
     </div>
