@@ -35,12 +35,14 @@ export const POST = async context => {
       Authorization: `Bearer ${RESEND_API_KEY}`,
     },
     body: JSON.stringify({
-      from: "onboarding@resend.dev",
+      from: "hello@emestudio.xyz",
       to: "mateo@emestudio.xyz",
       subject: "Message from personal site",
       html: `${email}: ${message}`,
     }),
   });
+
+  console.log(response);
 
   if (!response.ok) {
     return new Response(
