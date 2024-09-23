@@ -42,8 +42,6 @@ export const POST = async context => {
     }),
   });
 
-  console.log(response);
-
   if (!response.ok) {
     return new Response(
       JSON.stringify({
