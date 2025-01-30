@@ -13,15 +13,7 @@ export type Project = z.infer<typeof projectSchema>;
 
 export const projects: Project[] = [
   {
-    name: "project-toucans",
-    repo: "project-toucans-v2",
-    user: "emerald-dao",
-    description: "Create and manage DAOs on the Flow Blockchain.",
-    tags: ["Svelte", "TypeScript", "Flow"],
-    stars: undefined,
-  },
-  {
-    name: "tokenbase",
+    name: "Tokenbase",
     repo: "tokenbase",
     user: "mateoroldos",
     description: "Create, manage and export design tokens.",
@@ -29,15 +21,23 @@ export const projects: Project[] = [
     stars: undefined,
   },
   {
-    name: "floats",
+    name: "Floats",
     repo: "float",
     user: "emerald-dao",
-    description: "Flow proof of attendance dapp.",
+    description: "Proof of attendance on the Flow Blockchain.",
     tags: ["Svelte", "TypeScript", "Flow"],
     stars: undefined,
   },
   {
-    name: "personal-blog",
+    name: "Project Toucans",
+    repo: "project-toucans-v2",
+    user: "emerald-dao",
+    description: "Create and manage DAOs on the Flow Blockchain. ",
+    tags: ["Svelte", "TypeScript", "Flow"],
+    stars: undefined,
+  },
+  {
+    name: "Personal Blog",
     repo: "personal-blog",
     user: "mateoroldos",
     description: "Cool personal site.",
@@ -45,10 +45,19 @@ export const projects: Project[] = [
     stars: undefined,
   },
   {
-    name: "emerald-academy",
+    name: "Emerald Academy",
     repo: "emerald-academy-v2",
     user: "emerald-dao",
     description: "A platform for learning about the Flow Blockchain ecosystem.",
+    tags: ["Svelte", "TypeScript", "Flow"],
+    stars: undefined,
+  },
+  {
+    name: "CryptoKitties Arcade",
+    repo: "cryptokitties-arcade",
+    user: "emerald-dao",
+    description:
+      "Learn the Cadence programming languuage while saving kitties. Such a fun project!",
     tags: ["Svelte", "TypeScript", "Flow"],
     stars: undefined,
   },
