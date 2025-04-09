@@ -1,19 +1,27 @@
 ---
-import type { CollectionEntry } from "astro:content"
-import { formatDate } from "../lib/date"
-import Link from "./Link.tsx"
+import type { CollectionEntry } from "astro:content";
+import { formatDate } from "../lib/date";
+import Link from "./Link.tsx";
 
 type Props = {
-  post: CollectionEntry<"blog">
-}
+  post: CollectionEntry<"blog">;
+};
 
-const { post: { data: { title, date }, slug } } = Astro.props
+const {
+  post: {
+    data: { title, date },
+    slug,
+  },
+} = Astro.props;
 ---
 
-<article class="flex justify-between">
-  <Link href={`/blog/${slug}`}>
+<a
+  href={`/blog/${slug}`}
+  class="border-b pb-2 transition-colors hover:border-b-primary-200"
+>
+  <article class="flex items-baseline justify-between">
     <span transition:name={slug}>{title}</span>
-  </Link>
-  
-  <span>{formatDate(date)}</span>
-</article>
+
+    <span class="text-sm text-gray-500">{formatDate(date)}</span>
+  </article>
+</a>

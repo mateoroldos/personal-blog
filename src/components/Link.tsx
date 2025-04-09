@@ -13,7 +13,7 @@ function Link(props: LinkProps) {
     <a
       href={href}
       target={isExternal ? "_blank" : "_self"}
-      class="focus:outline-offset-6 group underline decoration-gray-300 decoration-wavy underline-offset-4 transition-colors hover:decoration-primary-300 focus:decoration-gray-500"
+      class="focus:outline-offset-6 group font-medium underline decoration-gray-300 decoration-wavy underline-offset-4 transition-colors hover:decoration-primary-300 focus:decoration-gray-500"
     >
       {children}
     </a>
