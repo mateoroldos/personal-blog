@@ -66,7 +66,7 @@ const { title, description, image = `${origin}/mateor-og.jpg` } = Astro.props;
   </head>
 
   <body
-    class="font-primary flex min-h-screen flex-col bg-gray-100 text-sm text-gray-700 md:text-base"
+    class="font-primary flex min-h-screen flex-col bg-gray-50 text-sm text-gray-700 md:text-base"
   >
     <!-- Google Tag Manager (noscript) -->
     <noscript
@@ -146,20 +146,20 @@ const { title, description, image = `${origin}/mateor-og.jpg` } = Astro.props;
       }
 
       .prose {
-        @apply max-w-container text-[0.95rem] [&>:not(:last-child)]:mb-6;
+        @apply max-w-container  text-gray-800 [&>:not(:last-child)]:mb-6;
 
         & h1,
         & h2,
         & h3 {
-          @apply my-8 font-semibold text-gray-950;
+          @apply my-8 font-medium text-gray-950;
         }
 
         & h1 {
-          @apply text-2xl;
+          @apply text-lg;
         }
 
         & h2 {
-          @apply text-xl;
+          @apply text-lg;
         }
 
         & h3 {

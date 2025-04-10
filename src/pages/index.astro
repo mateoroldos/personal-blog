@@ -26,21 +26,18 @@ const posts = sortPostsByDate(
 ---
 
 <Base {title} description="Personal website and blog of Mateo Roldos.">
-  <main class="mt-12 space-y-16">
+  <main class="mt-20 space-y-20">
     <section class="space-y-8">
       <p>
         I'm <strong>Mateo</strong>, <strong>UI Designer</strong> and
-        <strong>Sotware Developer</strong>. Currently diving deep into <Link
+        <strong>Web Developer</strong>. Currently diving deep into <Link
           href="https://www.inkandswitch.com/essay/local-first/"
           >local-first</Link
-        > and collaborative development.
+        > and collaborative software.
       </p>
-      <ul
-        class="list-inside
+      <ul class="list-inside
         list-disc
-        space-y-2
-        text-gray-500"
-      >
+        space-y-2">
         <li>Self-taught coder who loves building on the web.</li>
         <li>Founded <Link href="https://emestudio.xyz">EME studio</Link>.</li>
         <li>
@@ -58,8 +55,6 @@ const posts = sortPostsByDate(
           {posts.map(post => (
             <PostRow {post} />
           ))}
-
-          <a href="/blog">All posts →</a>
         </section>
       )
     }

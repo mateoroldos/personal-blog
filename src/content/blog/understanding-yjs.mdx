@@ -1,0 +1,365 @@
+---
+isDraft: false
+title: "Yjs - An Engine for Modern Collaborative Apps"
+description: "Discover how Yjs powers seamless collaboration in local-first applications"
+date: "April 10, 2025"
+tags: ["Local First", "Collaboration", "CRDTs"]
+---
+
+## Why Collaborative Editing Matters
+
+Think about the last time you used Google Docs, Notion, or Figma with other people. Everyone types, everyone sees changes instantly, and nobody's work gets lost. This feels magical, but it's built on sophisticated technology that works behind the scenes.
+
+Collaborative editing isn't just a nice feature anymore—it's becoming expected. Applications that can't support multiple editors working simultaneously feel outdated.
+
+## The Evolution of Collaboration: From OT to CRDTs
+
+To understand why CRDTs matters, let's look at how collaborative editing evolved.
+
+### Operational Transformation (OT): The First Wave
+
+Early collaborative systems like Google Docs used a technology called Operational Transformation (OT). The fundamental concept is simple:
+
+1. Track every change as an operation ("insert H at position 0", "insert i at position 1")
+2. Clients send each operation to a central server
+3. The server decides the correct order of operations
+4. The server transforms operations to make them work together
+
+OT works well but has fundamental limitations:
+
+- **Central server requirement**: OT needs a central server to establish operation order and resolve conflicts.
+
+- **Performance bottlenecks**: The central server processes every edit in sequence. With many users, the server can get overwhelmed—hence the "This document is overloaded" message you sometimes see in Google Docs.
+
+These limitations led researchers to look for a better approach—one that doesn't need central coordination.
+
+### CRDTs: The Breakthrough
+
+CRDTs solve the collaboration problem with an elegant approach: embed conflict resolution inside the data structure itself. This means:
+
+- Each client can apply the same rules independently
+- Every client reaches the same final state
+- No central authority needed to resolve conflicts
+
+The core insight is beautifully simple: **include the necessary metadata for conflict resolution inside the document itself and agree on a set of rules for handling conflicts.**
+
+This way every client can apply the same rules independently and reaches the same final state. No central authority needed.
+
+Early CRDTs were mostly theoretical because they had serious performance issues. The metadata needed for conflict resolution would often grow larger than the actual content.
+
+Newer implementations like Yjs solve these performance problems with clever optimizations. This has transformed CRDTs from academic curiosities into practical tools for real applications.
+
+## Diving Deeper - How Yjs Works Under the Hood
+
+Yjs implements CRDTs with remarkable efficiency. Let's look at what makes it work.
+
+### Items - The Core Building Block
+
+What makes collaboration without conflicts possible? How does content maintain its proper order when multiple people edit simultaneously? Yjs uses a simple but powerful concept: Items.
+
+Items are the basic units of content in Yjs. In a text document, each character in a text is stored as an Item. Each Item has:
+
+- A unique identifier (client ID + logical clock) - Tells us who created it and when
+- Content (text, object, etc.) - The actual data users see
+- Position information (what comes before and after it) - Keeps everything in the right order
+- Deletion status - Tracks if the item has been removed
+
+This metadata is why Yjs works. Let's see why.
+
+### Item Identity and Positioning
+
+Every Item has a unique identity consisting of:
+
+- **Client ID**: A number identifying which device created the content
+- **Clock value**: A simple counter that increases with each operation
+
+This identity system ensures that even when two clients create content simultaneously, each piece has a distinct, globally unique identifier.
+
+> **Note:** The "clock" isn't measuring time—it's a Lamport timestamp, a simple counter that increments each time a client makes a change.
+
+Items also store position information—which Items come before and after them. This allows Yjs to reconstruct the correct document state regardless of the order in which changes arrive.
+
+### Conflict Resolution Made Simple
+
+When conflicts occur (like two users inserting at the same position), Yjs uses deterministic rules to resolve them:
+
+1. If two Items want the same position, they're ordered by their creator's client ID
+2. Lower client IDs come first (a simple but effective tie-breaker)
+
+This may seem basic, but it's powerful: every device applying these rules independently will reach exactly the same document state, without any communication or negotiation.
+
+When an update arrives, the document itself knows where to place the new Items, and in case of conflicts, it has all the necessary data to resolve it by itself. No central server needed to make these decisions - the rules are built into the data.
+
+### The Efficiency Secret: Shared Sequences
+
+Wait, wouldn't creating an Item for every character cause massive overhead? This takes us to one of Yjs's most important innovations.
+
+Early CRDTs created a separate object for each character in a document, causing massive overhead. Yjs takes a smarter approach:
+
+When you type "hello", Yjs stores it as one Item, not five separate ones. Items only split when changes happen in the middle of them. This simple optimization dramatically reduces memory usage and improves performance.
+
+> **Performance Impact:** By grouping characters into single Items, Yjs reduces memory usage by 95% compared to naive CRDT implementations. A 100KB document might need only 105KB of total memory, rather than the 1MB+ required by earlier approaches.
+
+### Deletions Without Disruption
+
+When content is deleted in Yjs, it isn't actually removed from the internal structure. Instead, it's marked as deleted in a delete set. This preserves the structural relationships between Items, ensuring consistent document reconstruction across all peers.
+
+This approach keeps the relative positions of all content stable, avoiding the cascade of position changes that would happen if items were actually removed.
+
+## Building Applications with Yjs
+
+Now that we understand the theory, let's see how to use Yjs in real applications.
+
+### 1. The Y.Doc: Your Document Container
+
+Every Yjs implementation starts with creating a Y.Doc—a shared container that holds all collaborative data:
+
+```javascript
+// Initialize the shared document
+const ydoc = new Y.Doc();
+
+// Each client gets a unique ID automatically
+console.log(ydoc.clientID); // Unique client identifier
+
+// Listen for updates to track changes
+ydoc.on("update", update => {
+  // The update is a binary-encoded change that can be sent to other peers
+  console.log(update); // Uint8Array containing the update
+});
+```
+
+The Y.Doc is like a box for your collaborative data. It generates a unique client ID, manages internal state, and emits updates when changes occur.
+
+### 2. Shared Types for Different Data Needs
+
+Inside a Y.Doc, you can create specialized data structures called "shared types" for different kinds of data:
+
+```javascript
+// Text for collaborative editing (like a document)
+const ytext = ydoc.getText("note-content");
+
+// Map for key-value data (like metadata)
+const ymeta = ydoc.getMap("note-metadata");
+
+// Array for ordered lists (like todos)
+const ytags = ydoc.getArray("note-tags");
+
+// XML for tree structures (like rich text)
+const yxml = ydoc.getXmlFragment("note-richtext");
+```
+
+Each type is optimized for its specific purpose and implements CRDT logic internally. The string parameter ("note-content", etc.) is a slug that identifies which data you're working with, like a variable name.
+
+### 3. Working with Shared Types
+
+Using shared types feels similar to working with native JavaScript objects:
+
+```javascript
+// Working with shared text
+ytext.insert(0, "Hello, world!"); // Insert text at position 0
+ytext.delete(0, 5); // Delete 5 characters starting at position 0
+ytext.toString(); // Convert to string
+
+// Working with shared maps
+ymeta.set("title", "My Note"); // Set a key-value pair
+ymeta.get("title"); // Get a value
+ymeta.has("title"); // Check if a key exists
+
+// Working with shared arrays
+ytags.push(["important"]); // Add to the end
+ytags.delete(0, 1); // Delete one item at position 0
+ytags.toArray(); // Convert to regular array
+```
+
+The magic happens because these operations automatically:
+
+1. Update the local document immediately
+2. Generate update messages that can be sent to other peers
+3. Apply conflict resolution rules when needed
+
+### 4. Transactions for Atomic Changes
+
+When making multiple related changes, you can group them into transactions:
+
+```javascript
+// Group related changes in a transaction
+ydoc.transact(() => {
+  ytext.insert(0, "Title: ");
+  ymeta.set("created", new Date().toISOString());
+  ytags.push(["personal"]);
+});
+```
+
+Transactions ensure that all changes are applied atomically—either all succeed or none do. This helps maintain document consistency and generates a single update message containing all changes.
+
+## Synchronization and Persistence
+
+Yjs uses a modular architecture with different "providers" for various synchronization and storage needs.
+
+### WebSocket for Real-time Collaboration
+
+The y-websocket provider enables immediate synchronization when online:
+
+```javascript
+import { WebsocketProvider } from "y-websocket";
+
+const wsProvider = new WebsocketProvider(
+  "wss://notes-sync.example.com",
+  "note-document-id",
+  ydoc
+);
+
+// Handle connection status
+wsProvider.on("status", event => {
+  console.log("Connection status:", event.status);
+});
+```
+
+This provider connects to a WebSocket server that handles real-time message distribution. It automatically syncs document changes between all connected clients.
+
+### WebRTC for Peer-to-Peer Collaboration
+
+The y-webrtc provider creates direct connections between browsers:
+
+```javascript
+import { WebrtcProvider } from "y-webrtc";
+
+const webrtcProvider = new WebrtcProvider("note-document-id", ydoc, {
+  signaling: ["wss://signaling.yjs.dev"],
+});
+
+// Monitor peer connections
+webrtcProvider.on("peers", event => {
+  console.log("Connected peers:", event.webrtcPeers.length);
+});
+```
+
+WebRTC enables peer-to-peer connections, which can reduce latency and server load. It's particularly useful for applications that need to function even if the central server becomes unavailable.
+
+### IndexedDB for Offline Persistence
+
+The y-indexeddb provider stores document state in the browser's IndexedDB:
+
+```javascript
+import { IndexeddbPersistence } from "y-indexeddb";
+
+const persistence = new IndexeddbPersistence("note-document-id", ydoc);
+
+// Handle local storage syncing
+persistence.on("synced", () => {
+  console.log("Document loaded from local storage");
+});
+```
+
+This provider ensures that documents persist between browser sessions. When the user reopens your app, their document loads from local storage—even if they're offline.
+
+### User Awareness
+
+Beyond document content, Yjs includes a system for sharing user presence information:
+
+```javascript
+// Get the awareness instance from your provider
+const awareness = wsProvider.awareness;
+
+// Set your information
+awareness.setLocalStateField("user", {
+  name: "Alice",
+  color: "#1a73e8",
+  cursor: { position: 120, paragraph: 3 },
+});
+
+// Listen for changes from all users
+awareness.on("change", changes => {
+  // Get everyone's current information
+  const states = awareness.getStates();
+
+  // Update UI with this information
+  updateUserList(states);
+  updateCursors(states);
+});
+```
+
+Awareness enables features like:
+
+- Showing which users are currently in the document
+- Displaying cursors and selections
+- Indicating who's editing which section
+
+Unlike document content, awareness information is ephemeral—it disappears when users disconnect.
+
+## Advanced Features
+
+### Collaborative Undo/Redo
+
+Yjs includes built-in support for undo/redo that works across collaborators:
+
+```javascript
+import * as Y from "yjs";
+
+// Create undo manager for shared text
+const undoManager = new Y.UndoManager(ytext);
+
+// Undo last local change
+undoManager.undo();
+
+// Redo previously undone change
+undoManager.redo();
+
+// Update UI based on stack status
+undoManager.on("stack-item-added", () => {
+  updateUndoRedoButtons();
+});
+```
+
+The UndoManager tracks which changes came from which user, ensuring that people only undo their own changes—crucial for collaborative editing.
+
+### Document History and Snapshots
+
+Yjs makes it easy to implement document history features:
+
+```javascript
+// Capture current document state
+const snapshot = Y.snapshot(ydoc);
+
+// Convert to storable format
+const encodedSnapshot = Y.encodeSnapshot(snapshot);
+
+// Later, load a saved snapshot
+const decodedSnapshot = Y.decodeSnapshot(encodedSnapshot);
+
+// Create a document from the snapshot
+const previousDoc = Y.createDocFromSnapshot(ydoc, decodedSnapshot);
+```
+
+Snapshots are lightweight representations of document state that contain just enough information to reconstruct the document at a specific point in time. With snapshots, you can build features like version history, document comparisons, and point-in-time recovery.
+
+## The Local-First Advantage
+
+Yjs enables truly local-first applications with several key benefits:
+
+1. **Offline-first operation**: Users can work without an internet connection
+2. **Zero-latency editing**: Changes appear instantly without server roundtrips
+3. **Seamless synchronization**: Changes merge automatically when connectivity returns
+4. **Data ownership**: User data lives on their device first, not just in the cloud
+5. **Resilience**: No single point of failure
+
+These aren't just technical benefits—they fundamentally improve the user experience:
+
+- **Trust**: Users know their work won't disappear if their connection drops
+- **Responsiveness**: The app feels fast because it doesn't wait for server responses
+- **Autonomy**: Users control their data and can work anywhere
+
+## Conclusion and Next Steps
+
+CRDTs and Yjs represent a fundamental shift in how we build collaborative applications. By embedding conflict resolution in the data itself, we create experiences that are more resilient, responsive, and respectful of user autonomy.
+
+In the next chapter, we'll put this knowledge into practice by building a collaborative note-taking application using Svelte, SvelteKit, and Yjs. You'll see firsthand how these concepts translate into working code.
+
+### Further Reading
+
+If you want to dive deeper before the next chapter:
+
+- [Yjs Documentation](https://docs.yjs.dev/)
+- [CRDT Explained](https://crdt.tech/) - A comprehensive resource about CRDTs
+- [Are CRDTs Suitable for Shared Editing?](https://blog.kevinjahns.de/are-crdts-suitable-for-shared-editing/) - Kevin Jahns' article on CRDT performance
+- [Local-First Software](https://www.inkandswitch.com/local-first/) - The seminal paper on local-first development principles

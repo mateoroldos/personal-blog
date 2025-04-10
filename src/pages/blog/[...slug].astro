@@ -39,7 +39,8 @@ const { Content } = await post.render();
       )
     }
 
-    <h1 class="mt-8" transition:name={slug}>{title}</h1>
+    <h1 class="!mb-0 pt-8" transition:name={slug}>{title}</h1>
+    <p class="!mt-0 pb-6 text-gray-400">{formatDate(date)}</p>
     <Content />
   </div>
 </Base>

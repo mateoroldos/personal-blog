@@ -14,7 +14,7 @@ export default {
         },
       },
       maxWidth: {
-        container: "36rem",
+        container: "40rem",
       },
     },
   },
