@@ -70,7 +70,7 @@
   in:slide={{ axis: "y", duration: 800, delay: 200, easing: quintOut }}
   out:slide={{ axis: "y", duration: 1000, easing: quintOut }}
   autocomplete="off"
-  class="space-y-2 pb-4 w-full text-sm bg-primary-100 border border-gray-500 p-3 rounded-2xl flex flex-col items-end"
+  class="space-y-2 pb-4 w-full text-sm bg-primary-50 border border-gray-500 p-3 rounded-lg flex flex-col items-end text-gray-800"
 >
   <input
     type="email"
