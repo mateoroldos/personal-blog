@@ -10,11 +10,15 @@ import { projects } from "../lib/projects";
 const title = "mateor • home";
 
 const getProjectsWithStars = projects.map(async project => {
-  project.stars = await fetch(
-    `https://api.github.com/repos/${project.user}/${project.repo}`
-  )
-    .then(res => res.json())
-    .then(data => data.stargazers_count || undefined);
+  try {
+    const response = await fetch(
+      `https://api.github.com/repos/${project.user}/${project.repo}`
+    );
+    const data = await response.json();
+    project.stars = data.stargazers_count || 0;
+  } catch (error) {
+    project.stars = 0;
+  }
   return project;
 });
 
@@ -26,25 +30,14 @@ const posts = sortPostsByDate(
 ---
 
 <Base {title} description="Personal website and blog of Mateo Roldos.">
-  <main class="mt-20 space-y-20">
+  <main class="mt-12 space-y-20">
     <section class="space-y-8">
       <p>
-        I'm <strong>Mateo</strong>, <strong>UI Designer</strong> and
-        <strong>Web Developer</strong>. Currently diving deep into <Link
-          href="https://www.inkandswitch.com/essay/local-first/"
+        I'm Mateo, UI Designer and Web Developer. <br /> Currently diving deep into
+        <Link href="https://www.inkandswitch.com/essay/local-first/"
           >local-first</Link
         > and collaborative software.
       </p>
-      <ul class="list-inside
-        list-disc
-        space-y-2">
-        <li>Self-taught coder who loves building on the web.</li>
-        <li>Founded <Link href="https://emestudio.xyz">EME studio</Link>.</li>
-        <li>
-          Designed and developed
-          <Link href="https://app.token-base.com/">Tokenbase</Link>
-        </li>
-      </ul>
     </section>
 
     {
@@ -62,9 +55,7 @@ const posts = sortPostsByDate(
     <section class="flex flex-col gap-4">
       <h2 class="mb-2 text-xl">Projects</h2>
 
-      <div
-        class="flex grid-flow-row auto-rows-[1fr] flex-col gap-4 sm:grid sm:grid-cols-2"
-      >
+      <div class="flex flex-col gap-4 sm:grid sm:grid-cols-2">
         {projectsWithStars.map(project => <Project {project} />)}
       </div>
     </section>

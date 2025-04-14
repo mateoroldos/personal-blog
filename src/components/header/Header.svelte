@@ -7,11 +7,9 @@
   import { quintOut } from "svelte/easing";
   import { fly, slide, scale, fade } from "svelte/transition";
   import LocaleTime from "./atoms/LocaleTime.svelte";
-  import { onMount } from "svelte";
   import { Check, Copy } from "lucide-svelte";
   import OptionalLink from "./atoms/OptionalLink.svelte";
 
-  let visible = false;
   let messageSent = false;
   let isEmailCopied = false;
 
@@ -33,23 +31,13 @@
       }
     });
   };
-
-  onMount(() => {
-    visible = true;
-  });
 </script>
 
-{#if !messageSent && visible}
+{#if !messageSent}
   <header
-    class="z-50 w-[370px] border border-solid border-gray-600 flex flex-col align-start justify-start space-y-4 overflow-hidden shadow-xl inset-x-0 bg-gray-700 left-[50vw] -translate-x-1/2 p-[6px] rounded-3xl text-gray-200 fixed top-5 transition-[max-height,_transform,_opacity] ease-in-out duration-700"
+    class="z-50 w-[370px] border border-solid border-gray-700/50 flex flex-col align-start justify-start space-y-4 overflow-hidden shadow-sm inset-x-0 bg-primary-100 left-[50vw] -translate-x-1/2 p-[6px] rounded-xl text-gray-200 fixed top-5 transition-[max-height,_transform,_opacity] ease-in-out duration-700"
     class:translate-y-[100px]={$isOpen}
     use:updateOverflow
-    in:fly={{
-      duration: 600,
-      delay: 600,
-      easing: quintOut,
-      y: -100,
-    }}
     out:scale|local={{ duration: 1200, easing: quintOut }}
   >
     <div
@@ -61,17 +49,17 @@
         class="flex flex-row items-center overflow-hidden"
       >
         <slot name="avatar" />
-        <h1 class="hidden sm:block text-gray-50 font-medium ml-2">mateor</h1>
+        <h1 class="hidden sm:block font-normal ml-2">mateor</h1>
         {#if $isOpen}
           <div
             in:fade={{ delay: 600 }}
             class="flex flex-row gap-2 items-center"
           >
-            <span class="text-gray-500 font-normal">@emestudio.xyz</span>
+            <span class="text-gray-900 font-normal">@emestudio.xyz</span>
 
             <button
               on:click|preventDefault={handleCopyEmail}
-              class="border border-solid border-gray-600 ml-1 mt-1 relative rounded size-5"
+              class="border border-solid border-gray-300/70 ml-1 mt-1 relative rounded size-5 transition-colors duration-300"
             >
               {#if isEmailCopied}
                 <div
@@ -92,7 +80,7 @@
                   class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
                 >
                   <Copy
-                    class="text-gray-500 size-3 hover:text-gray-100 transition-colors ease-in-out duration-300"
+                    class="text-gray-600 size-3 transition-colors ease-in-out duration-300"
                   />
                 </div>
               {/if}
@@ -134,7 +122,7 @@
       duration: 1600,
       easing: quintOut,
     }}
-    class="fixed inset-0 z-40 bg-gray-950 p-6"
+    class="fixed inset-0 z-40 bg-primary-200 p-6"
   >
     <slot name="globe" />
     <div

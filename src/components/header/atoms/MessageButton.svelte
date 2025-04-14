@@ -8,7 +8,7 @@
 
 <button
   on:click={() => (isOpen = !isOpen)}
-  class="bg-primary-500 text-primary-50 rounded-full w-9 h-9 flex items-center justify-center font-medium hover:bg-primary-600 transition-colors ease-in-out duration-500"
+  class="bg-primary-400 text-gray-800 border border-gray-500 rounded-full w-9 h-9 flex items-center justify-center font-medium hover:bg-primary-300 transition-colors ease-in-out duration-500"
 >
   {#if isSendingMessage}
     <div class="animate-spin absolute" in:fly={{ x: 20, duration: 700 }}>

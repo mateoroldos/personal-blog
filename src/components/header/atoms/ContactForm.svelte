@@ -70,7 +70,7 @@
   in:slide={{ axis: "y", duration: 800, delay: 200, easing: quintOut }}
   out:slide={{ axis: "y", duration: 1000, easing: quintOut }}
   autocomplete="off"
-  class="space-y-2 pb-4 w-full text-sm bg-gray-800 p-3 rounded-2xl flex flex-col items-end"
+  class="space-y-2 pb-4 w-full text-sm bg-primary-100 border border-gray-500 p-3 rounded-2xl flex flex-col items-end"
 >
   <input
     type="email"
@@ -101,7 +101,7 @@
       {/if}
     </div>
     <button
-      class="bg-primary-500 px-3 py-1 rounded-lg text-primary-900 font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 ease-in-out"
+      class="bg-primary-300 px-3 py-1 rounded-lg text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 ease-in-out"
       disabled={isSendingMessage || !emailValid || !textareaValid}
     >
       {#if isSendingMessage}

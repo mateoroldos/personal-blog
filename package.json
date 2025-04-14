@@ -19,6 +19,7 @@
     "@astrojs/svelte": "^5.2.0",
     "@astrojs/tailwind": "^5.1.0",
     "@internationalized/date": "^3.5.2",
+    "@shikijs/themes": "^3.2.2",
     "astro": "^4.5.16",
     "github-slugger": "^2.0.0",
     "globe.gl": "^2.32.2",

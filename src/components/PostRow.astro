@@ -1,7 +1,13 @@
 ---
 import type { CollectionEntry } from "astro:content";
 import { formatDate } from "../lib/date";
-import Link from "./Link.tsx";
+import type { ImageMetadata } from "astro";
+import { Image } from "astro:assets";
+
+// Use glob to import all hero images
+const heroImages = import.meta.glob<{ default: ImageMetadata }>(
+  "/src/assets/images/*.{jpeg,jpg,png,gif,webp}"
+);
 
 type Props = {
   post: CollectionEntry<"blog">;
@@ -9,19 +15,37 @@ type Props = {
 
 const {
   post: {
-    data: { title, date },
+    data: { title, date, heroImage },
     slug,
   },
 } = Astro.props;
+
+// Construct the path to the hero image
+const heroImagePath = heroImage ? `/src/assets/images/${heroImage}` : null;
+const hasHeroImage = heroImagePath && heroImages[heroImagePath];
 ---
 
 <a
   href={`/blog/${slug}`}
-  class="border-b pb-2 transition-colors hover:border-b-gray-300"
+  class="post-row group flex gap-6 border-b py-4 transition-colors hover:border-b-gray-300"
 >
-  <article class="flex items-baseline justify-between">
-    <span transition:name={slug}>{title}</span>
+  {
+    hasHeroImage && (
+      <div class="hero-image h-32 w-80 flex-shrink-0 overflow-hidden rounded border border-gray-500 bg-primary-100 transition-all duration-300 ease-in-out group-hover:border-gray-600">
+        <Image
+          src={heroImages[heroImagePath]()}
+          alt={`Preview of ${title}`}
+          width={320}
+          height={180}
+          class="h-full w-full object-cover py-2"
+          transition:name={`hero-${slug}`}
+        />
+      </div>
+    )
+  }
 
-    <span class="text-sm text-gray-500">{formatDate(date)}</span>
-  </article>
+  <div class="flex flex-grow flex-col justify-center">
+    <h3 class="font-medium" transition:name={slug}>{title}</h3>
+    <p class="text-sm text-gray-500">{formatDate(date)}</p>
+  </div>
 </a>

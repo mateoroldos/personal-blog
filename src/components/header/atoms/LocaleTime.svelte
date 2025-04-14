@@ -34,11 +34,11 @@
   }, 1000);
 </script>
 
-<div class="text-gray-500 flex flex-col items-end text-right text-sm">
+<div class="text-gray-600 flex flex-col items-end text-right text-sm">
   <span>I am in Montevideo, Uruguay</span>
   <div class="flex flex-row gap-2">
     <span>UTC{mateoUTC}</span>
-    <span class="text-gray-300">
+    <span class="text-gray-900 font-semibold">
       <span>
         {mateoTime.hour}
       </span>
