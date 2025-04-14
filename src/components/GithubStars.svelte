@@ -9,7 +9,7 @@
 </script>
 
 <div
-  class="border border-solid border-gray-200 rounded-lg h-fit px-2 gap-1 text-xs font-semibold text-gray-600 flex flex-row items-center justify-start min-w-14"
+  class="border border-solid border-gray-200 rounded h-fit px-2 text-xs font-semibold text-gray-600 flex flex-row items-center justify-start min-w-14"
 >
   <Star class="w-3 text-primary-600" />
   <div class="flex items-center justify-center flex-1">
