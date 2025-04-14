@@ -66,7 +66,7 @@ export const animationScenes = [
 
 Think about the last time you used Google Docs, Notion, or Figma with other people. Everyone types, everyone sees changes instantly, and nobody's work gets lost.
 
-In this article, I'll deep dive into Yjs - a powerful technology that enables scalable and efficient peer-to-peer collaboration.
+In this article, I'll deep dive into Yjs - **a powerful technology that enables scalable and efficient peer-to-peer collaboration.**
 
 ## The Evolution of Collaboration: From OT to CRDTs
 
@@ -84,7 +84,7 @@ This ideas work well and are easy to reason about - but this architecture has fu
 
 - **Central server requirement**: OT needs a central server to establish operation order and resolve conflicts.
 
-- **Performance bottlenecks**: The central server needs to process every edit. With many users, the server can get overwhelmed—hence the "This document is overloaded" message you sometimes see in Google Docs.
+- **Performance bottlenecks**: The central server needs to process every edit. With many users, the server can get overwhelmed—_hence the "This document is overloaded" message you sometimes see in Google Docs._
 
 These limitations led researchers to look for a better approach.
 
@@ -94,17 +94,17 @@ CRDTs solve the collaboration problem with an elegant approach: embed conflict r
 
 The core insight is beautifully simple: **include the necessary metadata for conflict resolution inside the document itself and agree on a set of rules for handling conflicts.**
 
-- Each client can apply the same rules independently
-- Every client reaches the same final state
-- No central authority needed to resolve conflicts
+- **Each client can apply the same rules independently**
+- **Every client reaches the same final state**
+- **No central authority needed to resolve conflicts**
 
 Early CRDTs were mostly theoretical because they had serious performance issues. The metadata needed for conflict resolution would often grow larger than the actual content.
 
-Newer implementations like Yjs solve these performance problems with clever optimizations. This has transformed CRDTs from academic curiosities into practical tools for real applications.
+Newer implementations like Yjs solve these performance problems with clever optimizations.
 
 ## Diving Deeper - How Yjs Works Under the Hood
 
-So what makes collaboration without conflicts possible? How does content maintain its proper order when multiple people edit simultaneously?
+So how does Yjs prevent conflicts when multiple people edit at the same time? Let's see how it works:
 
 <StepByStepAnimation scenes={animationScenes} client:idle />
 
@@ -112,9 +112,9 @@ Easy, right? By knowing relative positions of each character and storing informa
 
 To make this work effectively, Yjs relies on a fundamental data structure known as Items, which forms the backbone of its conflict resolution system.
 
-### Items - The Core Building Block
+### `Item` - The Core Building Block
 
-Items are the basic units of content in Yjs. In a text document, each character in a text is stored as an Item. Each Item has:
+`Item`s are the basic units of content in Yjs. In a text document, each character in a text is stored as an Item. Each Item has:
 
 - **A unique identifier (client ID + logical clock)** - Tells us who created it and when
 - **Content (text, object, etc.)** - The actual data users see
@@ -152,7 +152,9 @@ Early CRDTs created a separate `Item` for each character in a document, causing 
 
 **When you type `hello`, Yjs stores it as one `Item`, not five separate ones. `Item`s only split when changes happen in the middle of them. This simple optimization dramatically reduces memory usage and improves performance.**
 
-> **Performance Impact:** By grouping characters into single Items, Yjs reduces memory usage by 95% compared to naive CRDT implementations. A 100KB document might need only 105KB of total memory, rather than the 1MB+ required by earlier approaches.
+As Kevin Jahns notes in his post [Are CRDTs Suitable for Shared Editing?](https://blog.kevinjahns.de/are-crdts-suitable-for-shared-editing/)
+
+> Most CRDTs assign a unique ID to every character that was ever created in the document. In Yjs, the complete document structure of a 100k character conference paper consists of only 11k Item objects instead of 260k objects for individual insertions/deletions. This type of compound representation dramatically reduces memory usage.
 
 ### Deletions Without Disruption
 
@@ -202,11 +204,11 @@ ydoc.on("update", update => {
 });
 ```
 
-The Y.Doc is like a box for your collaborative data. It generates a unique client ID, manages internal state, and emits updates when changes occur.
+The `Y.Doc` is like a box for your collaborative data. It generates a unique client ID, manages internal state, and emits updates when changes occur.
 
 ### 2. Shared Types for Different Data Needs
 
-Inside a Y.Doc, you can access a map structure that organizes your collaborative data. This map associates string keys with content, similar to a JavaScript object. Within this map, you'll store "shared types" - specialized data structures designed for different kinds of collaborative data needs.
+Inside a `Y.Doc`, you can access a map structure that organizes your collaborative data. This map associates string keys with content, similar to a JavaScript object. Within this map, you'll store "shared types" - specialized data structures designed for different kinds of collaborative data needs.
 
 ```javascript
 // Text for collaborative editing (like a document)
@@ -245,9 +247,9 @@ ytags.toArray(); // Convert to regular array
 
 The magic happens because these operations automatically:
 
-1. Update the local document immediately
-2. Generate update messages that can be sent to other peers
-3. Apply conflict resolution rules when needed
+1. **Update the local document immediately**
+2. **Generate update messages that can be sent to other peers**
+3. **Apply conflict resolution rules when needed**
 
 ### 4. Transactions for Atomic Changes
 
@@ -383,7 +385,7 @@ undoManager.on("stack-item-added", () => {
 });
 ```
 
-The UndoManager tracks which changes came from which user, ensuring that people only undo their own changes—crucial for collaborative editing.
+The `UndoManager` tracks which changes came from which user, ensuring that people only undo their own changes—crucial for collaborative editing.
 
 ### Document History and Snapshots
 
@@ -435,3 +437,6 @@ If you want to dive deeper before the next chapter:
 - [CRDT Explained](https://crdt.tech/) - A comprehensive resource about CRDTs
 - [Are CRDTs Suitable for Shared Editing?](https://blog.kevinjahns.de/are-crdts-suitable-for-shared-editing/) - Kevin Jahns' article on CRDT performance
 - [Local-First Software](https://www.inkandswitch.com/local-first/) - The seminal paper on local-first development principles
+- [Lars Hupel's Blog CRDT Series](https://lars.hupel.info/topics/crdt/01-intro/) - An approachable introduction to CRDTs by Lars Hupel
+- [Bartosz Sypytkowski's Blog CRDT Series](https://www.bartoszsypytkowski.com/tag/crdt/) - Bartosz Sypytkowski's is a Yjs maintainer and shares awesome stuff in his blog
+- [Tag1 Consulting Yjs Youtube Series](https://www.youtube.com/watch?v=_OwHt1lsyKk&list=PLASRuhw5l8pkZYv-IU7VjrQZgKOfRWD_0) - An awesome YouTube series exploring Yjs
