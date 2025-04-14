@@ -4,7 +4,6 @@ import Footer from "../components/Footer.astro";
 import Header from "../components/header/Header.svelte";
 import { Image } from "astro:assets";
 import avatar from "../images/mateor-avatar.png";
-import CablesGlobe from "../components/header/globe/CablesGlobe.svelte";
 
 type Props = {
   title: string;
@@ -37,12 +36,16 @@ const { title, description, image = `${origin}/mateor-og.jpg` } = Astro.props;
 
     <!-- global metadata -->
     <meta charset="utf-8" />
-  </head>p <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <link rel="icon" href="/mateor-avatar.svg" />
-  <meta name="generator" content={Astro.generator} />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="icon" href="/mateor-avatar.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>
+      {title}
+    </title>
+  </head>
 
   <!-- primary meta tags -->
-  <title>{title}</title>
+
   <meta name="title" content={title} />
   <meta name="description" content={description} />
 
