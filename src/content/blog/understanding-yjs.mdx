@@ -91,7 +91,7 @@ To understand why Yjs matters, let's first look at how collaborative editing evo
 
 Early collaborative systems like Google Docs used a technology called Operational Transformation (OT). The fundamental concept is simple: track every change as an operation (like `insert H at position 0`), send these operations to a central server, and let the server determine the correct order of operations.
 
-While these ideas work well and are easy to reason about, this architecture comes with fundamental limitations. OT requires a central which inevitably creates performance bottlenecks as the server must process every edit. Ever received a "This document is overloaded" message in Google Docs when too many people are editing at the same time?
+While these ideas work well and are easy to reason about, this architecture comes with fundamental limitations. OT requires a central server to process all operations which inevitably creates performance bottlenecks. Ever received a "This document is overloaded" message in Google Docs when too many people are editing at the same time?
 
 These limitations led researchers to look for a better approach.
 
