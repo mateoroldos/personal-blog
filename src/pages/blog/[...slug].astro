@@ -48,9 +48,7 @@ const heroImagePath = heroImage ? `/src/assets/images/${heroImage}` : null;
       )
     }
 
-    <h1 class="!mb-0" transition:name={slug}>{title}</h1>
-    <p class="!mt-0 pb-6 text-gray-400">{formatDate(date)}</p>
-    {
+    <!-- {
       heroImagePath && heroImages[heroImagePath] && (
         <Image
           src={heroImages[heroImagePath]()}
@@ -61,7 +59,9 @@ const heroImagePath = heroImage ? `/src/assets/images/${heroImage}` : null;
           transition:name={`hero-${slug}`}
         />
       )
-    }
+    } -->
+    <h1 class="!mb-0 !mt-16" transition:name={slug}>{title}</h1>
+    <p class="!mt-0 pb-6 text-gray-400">{formatDate(date)}</p>
     <Content />
   </div>
 </Base>
