@@ -73,7 +73,7 @@ export const animationScenes = [
 
 If you want to see Yjs
 in action, continue to the next chapter where I'll build a local-first
-markdown editor using SvelteKit and Yjs.
+markdown editor using SvelteKit and Yjs that shares data peer-to-peer.
 
 </TLDR>
 
@@ -89,13 +89,9 @@ To understand why Yjs matters, let's first look at how collaborative editing evo
 
 ### Operational Transformation (OT): The First _Wave_
 
-Early collaborative systems like Google Docs used a technology called Operational Transformation (OT). The fundamental concept is simple:
+Early collaborative systems like Google Docs used a technology called Operational Transformation (OT). The fundamental concept is simple: track every change as an operation (like `insert H at position 0`), send these operations to a central server, and let the server determine the correct order of operations.
 
-1. Track every change as an operation (`insert H at position 0`, `insert i at position 1`)
-2. Clients send each operation to a central server
-3. The server decides the correct order of operations maintaining a single source of truth
-
-While these ideas work well and are easy to reason about, this architecture comes with fundamental limitations. OT requires a central server to establish operation order and resolve conflicts, which inevitably creates performance bottlenecks as the server must process every edit from all users simultaneously. Ever received a "This document is overloaded" message in Google Docs when too many people are editing at the same time?
+While these ideas work well and are easy to reason about, this architecture comes with fundamental limitations. OT requires a central which inevitably creates performance bottlenecks as the server must process every edit. Ever received a "This document is overloaded" message in Google Docs when too many people are editing at the same time?
 
 These limitations led researchers to look for a better approach.
 
