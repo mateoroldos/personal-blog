@@ -33,10 +33,10 @@ const slug = post.slug;
 const { Content } = await post.render();
 
 // Construct the path to the hero image
-const heroImagePath = heroImage ? `/src/assets/images/${heroImage}` : null;
+const heroImagePath = heroImage ? `/src/assets/images/${heroImage}` : undefined;
 ---
 
-<Base {title} description={description}>
+<Base {title} description={description} image={heroImagePath}>
   <div class="prose">
     {
       isDraft && (
