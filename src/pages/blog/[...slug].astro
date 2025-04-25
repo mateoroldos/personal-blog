@@ -1,13 +1,8 @@
 ---
 import type { CollectionEntry } from "astro:content";
-import { getCollection } from "astro:content";
+import { getCollection, getEntry, render } from "astro:content";
 import Base from "../../layouts/Base.astro";
 import { formatDate } from "../../lib/date";
-// import type { ImageMetadata } from "astro";
-
-// const heroImages = import.meta.glob<{ default: ImageMetadata }>(
-//   "/src/assets/images/*.{jpeg,jpg,png,gif,webp}"
-// );
 
 export async function getStaticPaths() {
   const posts = await getCollection("blog");
@@ -28,10 +23,10 @@ const {
     data: { title, description, date, isDraft, heroImage },
   },
 } = Astro.props;
-const slug = post.slug;
-const { Content } = await post.render();
 
-// Construct the path to the hero image
+const slug = post.slug;
+const { Content } = await render(post);
+
 const heroImagePath = heroImage ? `/src/assets/images/${heroImage}` : undefined;
 ---
 
@@ -47,18 +42,6 @@ const heroImagePath = heroImage ? `/src/assets/images/${heroImage}` : undefined;
       )
     }
 
-    <!-- {
-      heroImagePath && heroImages[heroImagePath] && (
-        <Image
-          src={heroImages[heroImagePath]()}
-          alt={`Hero image for ${title}`}
-          width={1200}
-          height={600}
-          class="h-full w-full border border-gray-500 object-cover"
-          transition:name={`hero-${slug}`}
-        />
-      )
-    } -->
     <h1 class="!mb-0 !mt-16" transition:name={slug}>{title}</h1>
     <p class="!mt-0 pb-6 text-gray-400">{formatDate(date)}</p>
     <Content />
