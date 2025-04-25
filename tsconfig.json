@@ -4,5 +4,6 @@
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
     "allowImportingTsExtensions": true
-  }
+  },
+  "exclude": ["node_modules"]
 }
