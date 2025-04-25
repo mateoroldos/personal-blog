@@ -35,10 +35,10 @@
 
 {#if !messageSent}
   <header
-    class="z-50 w-[370px] border border-solid border-gray-700/50 flex flex-col align-start justify-start space-y-4 overflow-hidden shadow-sm inset-x-0 bg-primary-100 left-[50vw] -translate-x-1/2 p-[6px] rounded-xl text-gray-200 fixed top-5 transition-[max-height,_transform,_opacity] ease-in-out duration-700"
-    class:translate-y-[100px]={$isOpen}
-    use:updateOverflow
-    out:scale|local={{ duration: 1200, easing: quintOut }}
+      class="z-50 max-w-[370px] w-[95%] border border-solid border-gray-700/50 flex flex-col align-start justify-start space-y-4 overflow-hidden shadow-sm inset-x-0 bg-primary-100 left-[50vw] -translate-x-1/2 p-[4px] rounded-xl text-gray-200 fixed top-5 transition-[max-height,_transform,_opacity] ease-in-out duration-700"
+      class:translate-y-[100px]={$isOpen}
+      use:updateOverflow
+      out:scale|local={{ duration: 1200, easing: quintOut }}
   >
     <div
       class="flex flex-row justify-between items-center md:gap-14 gap-6 flex-1 overflow-hidden relative"
