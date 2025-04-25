@@ -1,8 +1,9 @@
 import type { APIRoute } from "astro";
+import { MAILERLITE_API_KEY } from "astro:env/server";
 
 export const prerender = false;
 
-export const POST: APIRoute = async ({ request, locals }) => {
+export const POST: APIRoute = async ({ request }) => {
   const form = await request.formData();
   const email = form.get("email");
 
@@ -16,16 +17,12 @@ export const POST: APIRoute = async ({ request, locals }) => {
     );
   }
 
-  console.log("api key:", locals.runtime.env.MAILERLITE_API_KEY);
-
   try {
     const res = await fetch("https://api.mailerlite.com/api/v2/subscribers", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-MailerLite-ApiKey": import.meta.env.DEV
-          ? import.meta.env.MAILERLITE_API_KEY
-          : locals.runtime.env.MAILERLITE_API_KEY,
+        "X-MailerLite-ApiKey": MAILERLITE_API_KEY,
       },
       body: JSON.stringify({
         email,

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { RESEND_API_KEY } from "astro:env/server";
 
 export const prerender = false;
 
@@ -23,10 +24,6 @@ export const POST = async context => {
       { status: 400 }
     );
   }
-
-  const RESEND_API_KEY = import.meta.env.DEV
-    ? import.meta.env.RESEND_API_KEY
-    : context.locals.runtime.env.RESEND_API_KEY;
 
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
