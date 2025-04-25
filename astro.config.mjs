@@ -12,7 +12,7 @@ import ayuMirage from "@shikijs/themes/ayu-dark";
 // https://astro.build/config
 export default defineConfig({
   site: "https://mateor.xyz",
-  output: "static",
+  output: "server",
   integrations: [
     mdx(),
     sitemap(),
