@@ -20,14 +20,14 @@ const {
   <div class="flex flex-col justify-between">
     <div>
       <div class="flex items-center justify-between gap-4">
-        <h3 class="text-base font-medium">{name}</h3>
-        {stars && <GithubStars client:idle {stars} />}
+        <h3 class="text-sm font-medium">{name}</h3>
+        <!-- {stars && <GithubStars client:idle {stars} />} -->
       </div>
       <p class="mt-1 text-sm text-gray-500">{description}</p>
     </div>
 
-    <div class="mt-3 flex flex-wrap gap-2">
+    <!-- <div class="mt-3 flex flex-wrap gap-2">
       {tags.map(tag => <Tag {tag} isLink={false} />)}
-    </div>
+    </div> -->
   </div>
 </a>

@@ -9,10 +9,9 @@ import partytown from "@astrojs/partytown";
 import solidJs from "@astrojs/solid-js";
 import ayuMirage from "@shikijs/themes/ayu-dark";
 
-// https://astro.build/config
 export default defineConfig({
-  site: "https://mateor.xyz",
-  output: "server",
+  site: "https://mr19.xyz",
+  output: "static",
   integrations: [
     mdx(),
     sitemap(),

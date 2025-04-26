@@ -1,23 +1,23 @@
 ---
 import type { CollectionEntry } from "astro:content";
-import { getEntry, render } from "astro:content";
+import { getCollection, getEntry, render } from "astro:content";
 import Base from "../../layouts/Base.astro";
 import { formatDate } from "../../lib/date";
 
-const { slug } = Astro.params;
-if (slug === undefined) {
-  return Astro.redirect("/404");
+export async function getStaticPaths() {
+  const blogEntries = await getCollection("blog");
+
+  return blogEntries.map(entry => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }));
 }
 
-const post = await getEntry("blog", slug);
-if (post === undefined) {
-  return Astro.redirect("/404");
-}
-
+const { entry } = Astro.props;
 const {
   data: { title, description, date, isDraft, heroImage },
-} = post;
-const { Content } = await render(post);
+} = entry;
+const { Content } = await render(entry);
 
 const heroImagePath = heroImage ? `/src/assets/images/${heroImage}` : undefined;
 ---
@@ -34,7 +34,7 @@ const heroImagePath = heroImage ? `/src/assets/images/${heroImage}` : undefined;
       )
     }
 
-    <h1 class="!mb-0 !mt-16" transition:name={slug}>{title}</h1>
+    <h1 class="!mb-0 !mt-16" transition:name={entry.slug}>{title}</h1>
     <p class="!mt-0 pb-6 text-gray-400">{formatDate(date)}</p>
     <Content />
   </div>
