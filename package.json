@@ -24,6 +24,7 @@
     "astro": "^5.7.5",
     "github-slugger": "^2.0.0",
     "lucide-svelte": "^0.363.0",
+    "sharp": "^0.34.1",
     "solid-js": "^1.9.5",
     "svelte": "^5.0.0",
     "tailwindcss": "^3.4.17",
