@@ -35,7 +35,9 @@ export default defineConfig({
       wrap: true,
     },
   },
-  adapter: cloudflare(),
+  adapter: cloudflare({
+    imageService: "compile",
+  }),
   env: {
     schema: {
       RESEND_API_KEY: envField.string({
