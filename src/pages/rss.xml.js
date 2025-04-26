@@ -10,7 +10,7 @@ export async function GET(context) {
   return rss({
     title: "mr19 blog",
     description:
-      "Sharing knowledge about local first and collaborative software",
+      "Sharing knowledge about local-first and collaborative software",
     site: context.site,
     items: publishedPosts.map(post => ({
       title: post.data.title,

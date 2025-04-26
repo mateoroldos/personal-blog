@@ -30,10 +30,10 @@
         for="email"
         class="text-sm font-medium text-gray-800"
       >
-        Join the Local-First Software Journey
+        Sharing knowledge around local-first and collaborative software development
       </label>
       <p class="text-sm text-gray-500">
-        Practical insights about building local-first and collaborative software. One useful email per month.
+        I will share practical insights about building modern local-first and collaborative applications. One useful email per month.
       </p>
     </div>
 
