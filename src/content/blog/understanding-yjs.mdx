@@ -52,7 +52,7 @@ export const animationScenes = [
     id: "step7",
     title: "🤝 Conflict Resolution",
     description:
-      "When conflicts occur Yjs resolves it automatically. The character placed by the User with smaller ID will go first. Easy, all clients will decide that the correct word is 'sctale'.",
+      "When conflicts occur Yjs resolves it automatically. The character placed by the User with smaller ID will go first. Easy, all clients will independently decide that the correct word is 'sctale'.",
     imageSrc: "/animations/yjs/step_7.jpg",
   },
   {
@@ -77,29 +77,35 @@ markdown editor using SvelteKit and Yjs that shares data peer-to-peer.
 
 </TLDR>
 
-## Why Collaborative Editing Matters
+## The Complexities of Collaborative Editing
 
-Think about the last time you used Google Docs, Notion, or Figma with other people. Everyone types, everyone sees changes instantly, and nobody's work gets lost.
+Think about the last time you used Notion or Figma. Everyone types, everyone sees changes instantly, nobody's work gets lost. Everything just works.
 
-Creating these experiences is challenging - **we need to handle conflicts, sync users data, and maintain offline capabilities.** Thankfully, technologies like Yjs now hide much of this complexity, so we don't need a PhD in distributed systems to build collaborative applications that simply work.
+If you are a web developer like me you know that these seamless experiences hide lot's of complex layers behind the scenes. The application needs to **handle conflicting edits, sync data across devices, maintain offline capabilities and ensure real-time responsiveness.** Solve that and you just grasp the surface.
+
+Consequently, creating these experiences used to take years of work of highly specialized teams.
+
+Thankfully those days are over. Technologies like Yjs now handle much of these complexities under the hood, enabling us to create collaborative applications in days and without the need of a PhD in distributed systems.
 
 ## The Evolution of Collaboration: From OT to CRDTs
 
-To understand why Yjs matters, let's first look at how collaborative editing evolved over the last years.
+To understand why Yjs is so relevant let's take a look at how collaborative editing evolved over the last years.
 
 ### Operational Transformation (OT): The First _Wave_
 
-Early collaborative systems like Google Docs used a technology called Operational Transformation (OT). The fundamental concept is simple: track every change as an operation (like `insert H at position 0`), send these operations to a central server, and let the server determine the correct order of operations.
+Early collaborative systems like Google Docs used a technology called Operational Transformation (OT). The idea behind it is simple: track every change as an operation (`insert character H at position 0`), then send these operations to a central server that decides the correct order of operations. If a conflicting edit occurs the server decides the correct order of operations.
 
-While these ideas work well and are easy to reason about, this architecture comes with fundamental limitations. OT requires a central server to process all operations which inevitably creates performance bottlenecks. Ever received a "This document is overloaded" message in Google Docs when too many people are editing at the same time?
+While these ideas work well and are easy to reason about, this architecture comes with a fundamental limitation. OT requires a central server to process all operations which inevitably creates performance bottlenecks. Ever received a _"This document is overloaded"_ message in Google Docs when too many people are editing at the same time?
 
-These limitations led researchers to look for a better approach.
+This took researchers to look for a better approach.
 
 ### CRDTs: The Breakthrough
 
-CRDTs revolutionize collaboration with a different approach: embedding conflict resolution into the data structure itself. **By following a simple set of rules and maintaing necessary metadata inside the document, each client can independently reach the same final document.** No central authority is needed to arbitrate conflicts.
+CRDTs revolutionize collaboration with a different approach: embedding conflict resolution into the data structure itself.
 
-Early CRDTs had serious performance issues because the metadata needed for conflict resolution would often grow larger than the actual content. Newer implementations like Yjs solve these performance problems with clever optimizations.
+**By following a simple set of rules and maintaing necessary metadata inside the document, each client can independently reach the same final document.** No central authority is needed to arbitrate conflicts.
+
+Early CRDTs had serious performance issues because the metadata needed for conflict resolution would often grow larger than the actual content. Here comes the importance of Yjs. **Through clever optimizations, Yjs manages to keep the metadata size small while still providing conflict-free collaboration.**
 
 ## Diving Deeper - How Yjs Works Under the Hood
 
