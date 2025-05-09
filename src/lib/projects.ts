@@ -13,6 +13,14 @@ export type Project = z.infer<typeof projectSchema>;
 
 export const projects: Project[] = [
   {
+    name: "md.uy",
+    repo: "md.uy",
+    user: "mateoroldos",
+    description: "Peer-to-peer markdowin editor. ",
+    tags: ["Yjs", "TypeScript", "Svelte"],
+    stars: undefined,
+  },
+  {
     name: "Tokenbase",
     repo: "tokenbase",
     user: "mateoroldos",
@@ -25,14 +33,6 @@ export const projects: Project[] = [
     repo: "float",
     user: "emerald-dao",
     description: "Proof of attendance on the Flow Blockchain.",
-    tags: ["Svelte", "TypeScript", "Flow"],
-    stars: undefined,
-  },
-  {
-    name: "Project Toucans",
-    repo: "project-toucans-v2",
-    user: "emerald-dao",
-    description: "Create and manage DAOs on the Flow Blockchain. ",
     tags: ["Svelte", "TypeScript", "Flow"],
     stars: undefined,
   },

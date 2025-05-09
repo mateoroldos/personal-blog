@@ -28,9 +28,9 @@
     <div class="flex flex-col gap-2">
       <label
         for="email"
-        class="text-sm font-medium text-gray-800"
+        class="font-medium text-gray-800"
       >
-        Sharing knowledge around local-first and collaborative software development
+        Join my journey exploring local-first software & collaboration techniques
       </label>
       <p class="text-sm text-gray-500">
         I will share practical insights about building modern local-first and collaborative applications. One useful email per month.

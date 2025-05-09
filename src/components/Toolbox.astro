@@ -1,0 +1,41 @@
+---
+interface Technology {
+  name: string;
+  logo: string;
+  description: string;
+}
+
+interface Props {
+  technologies: Technology[];
+  title?: string;
+}
+
+const { technologies, title = "Tech Stack" } = Astro.props;
+---
+
+<div class="rounded border border-gray-500 bg-white p-6">
+  <div class="mb-4 flex items-center gap-2">
+    <span class="text-xl">⚒️</span>
+    <h3 class="!m-0 text-lg font-bold">
+      {title}
+    </h3>
+  </div>
+
+  <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+    {
+      technologies.map(tech => (
+        <div class="flex h-fit flex-row items-start gap-3 rounded border border-gray-400 bg-primary-50 p-3">
+          <img
+            src={tech.logo}
+            alt={tech.name}
+            class="!mb-0 !mt-1 w-6 object-contain"
+          />
+          <div>
+            <h4 class="!m-0 text-sm font-bold">{tech.name}</h4>
+            <p class="!m-0 text-sm text-gray-600">{tech.description}</p>
+          </div>
+        </div>
+      ))
+    }
+  </div>
+</div>

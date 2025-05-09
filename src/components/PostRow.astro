@@ -29,7 +29,7 @@ const hasHeroImage = heroImagePath && heroImages[heroImagePath];
   href={`/blog/${slug}`}
   class="post-row group flex gap-6 border-b py-4 transition-colors hover:border-b-gray-300"
 >
-  {
+  <!-- {
     hasHeroImage && (
       <div class="hidden h-32 w-80 flex-shrink-0 overflow-hidden rounded border border-gray-500 bg-primary-100 transition-all duration-300 ease-in-out group-hover:border-gray-600 sm:block">
         <Image
@@ -41,7 +41,7 @@ const hasHeroImage = heroImagePath && heroImages[heroImagePath];
         />
       </div>
     )
-  }
+  } -->
 
   <div class="flex flex-grow flex-col justify-center">
     <h3 class="font-medium" transition:name={slug}>{title}</h3>

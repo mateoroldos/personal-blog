@@ -1,0 +1,594 @@
+---
+isDraft: false
+title: "Building md.uy - Peer-to-Peer Markdown Editor"
+description: "Learn how to build a collaborative markdown editor using SvelteKit and Yjs. Multiple people can edit documents simultaneously, changes sync automatically, and everything works offline. The best part? No server required - browsers connect directly to each other."
+date: "May 9, 2025"
+tags: ["Local First", "Collaboration", "CRDTs"]
+heroImage: "yjs.jpg"
+---
+
+import Toolbox from "../../components/Toolbox.astro";
+import PostRow from "../../components/PostRow.astro";
+
+In this post we are going to build a collaborative markdown editor using SvelteKit and Yjs. This editor will allow multiple people to edit documents simultaneously, it will sync changes automatically, and everything will work offline. The best part? No central server will be required - browsers will connect directly to each other to share document data.
+
+<Toolbox
+  technologies={[
+    {
+      name: "Yjs",
+      logo: "/icons/yjs.svg",
+      description: "CRDT framework for real-time collaborative applications",
+    },
+    {
+      name: "Webrtc",
+      logo: "/icons/webrtc.svg",
+      description: "P2P communication protocol between web browsers",
+    },
+    {
+      name: "Svelte",
+      logo: "/icons/svelte.svg",
+      description: "UI framework with less code and no virtual DOM",
+    },
+    {
+      name: "Codemirror",
+      logo: "/icons/codemirror.svg",
+      description: "Browser-based text editor for code editing",
+    },
+  ]}
+  note
+/>
+
+Before diving in, I highly recommend checking out the [previous chapter](/blog/understanding-yjs) where we explored Yjs. Yjs, together with webrtc protocol are the base techonologies for the peer-to-peer collaboration to work. Understaing how these technologies work is key for understanding how our editor works under the hood.
+
+## What We're Building
+
+Our markdown editor will include:
+
+- Real-time collaborative editing with multiple users
+- Markdown preview with syntax highlighting
+- Peer-to-peer synchronization (no server required)
+- Offline support with automatic reconnection
+- User presence indicators showing who's editing and where
+- Persistent storage so your work is never lost
+
+Check out [md.uy](https://md.uy/) a finished and improved version of our editor.
+
+Let's dive right in.
+
+## Project Setup
+
+First, let's create a new SvelteKit project and install the necessary dependencies:
+
+```bash
+# Create a new SvelteKit project
+pnpx create-svelte collaborative-markdown
+# step 1
+☑︎ SvelteKit minimal
+# step 2
+☑︎ Yes, using TypeScript syntax
+# step 3
+☑︎ prettier
+☑︎ eslint
+☑︎ tailwindcss
+# step 4 - skip
+# step 5
+☑︎ pnpm
+
+cd collaborative-markdown
+
+# Install dependencies
+pnpm install yjs y-webrtc y-indexeddb codemirror @codemirror/lang-markdown @codemirror/state marked randomcolor nanoid y-codemirror.next
+```
+
+The key dependencies we're using are:
+
+- `yjs`: The core library for real-time collaboration
+- `y-webrtc`: WebRTC provider to handle peer-to-peer connections
+- `y-indexeddb`: Persistent storage for offline support
+- `codemirror`: Text editor with syntax highlighting
+- `y-codemirror.next`: Integration between Yjs and CodeMirror
+- `marked`: Markdown parsing for the preview
+- `randomcolor`: Generates colors for user cursors
+
+## Creating the Base Application
+
+Let's set up our folder structure:
+
+```
+src/
+├── lib/
+│   ├── components/
+│   │   ├── Editor.svelte
+│   │   ├── Preview.svelte
+│   │   ├── Profile.svelte
+│   │   └── ConnectedUsers.svelte
+│   ├── editor/
+│   │   ├── initYjs.ts
+│   │   ├── initCodemirror.ts
+│   │   └── codemirror-action.svelte.ts
+│   ├── stores/
+│   │   ├── connected-users.svelte.ts
+│   │   └── active-user.svelte.ts
+│   └── constants.ts
+├── routes/
+│   ├── +page.svelte
+│   └── [id]/+page.svelte
+```
+
+And define some configuration constants:
+
+```typescript
+// src/lib/constants.ts
+export const Y_TEXT_KEY = "markdown-note";
+export const ACTIVE_USER_KEY = "markdown-note:active-user";
+```
+
+## Initializing Yjs
+
+Let's start with the most important part - setting up a function that creates a Yjs Document with WebRTC collaboration and IndexedDB persistance:
+
+```typescript
+// src/lib/editor/initYjs.ts
+import { WebrtcProvider } from "y-webrtc";
+import { IndexeddbPersistence } from "y-indexeddb";
+import * as Y from "yjs";
+import { Y_TEXT_KEY } from "$lib/constants";
+import { PUBLIC_SIGNALING_SERVER } from "$env/static/public";
+
+export const initYjs = (id: string) => {
+  const ydoc = new Y.Doc();
+
+  const provider = new WebrtcProvider(id, ydoc, {
+    signaling: [PUBLIC_SIGNALING_SERVER ?? "http://localhost:8787"],
+  });
+  const persistance = new IndexeddbPersistence(id, ydoc);
+
+  const ytext = ydoc.getText(Y_TEXT_KEY);
+
+  const cleanup = () => {
+    if (ydoc) {
+      ydoc.destroy();
+    }
+    if (provider) {
+      provider.destroy();
+    }
+    if (persistance) {
+      persistance.destroy();
+    }
+  };
+
+  return { ydoc, provider, persistance, ytext, cleanup };
+};
+```
+
+This initialization code:
+
+1. Creates a new Yjs document with a unique ID
+2. Sets up WebRTC for peer-to-peer connections using a signaling server.
+3. Configures IndexedDB for offline persistence
+4. Creates a shared text instance for our editor
+5. Provides a cleanup function to prevent memory leaks
+
+The signaling server helps browsers discover each other - when a user joins, the signaling server relays their connection information (IP, ports, etc.) to other peers so they can establish direct connections. There are several public signaling servers available like `wss://y-webrtc-eu.fly.dev`.
+
+## Integrating with CodeMirror
+
+Now that we have the base Yjs document to work with, we need to create and bind our Yjs Text to a text editor. For that, nothing better than the awesome CodeMirror library.
+
+```typescript
+// src/lib/editor/initCodemirror.ts
+import * as Y from "yjs";
+import { WebrtcProvider } from "y-webrtc";
+import { yCollab } from "y-codemirror.next";
+import { EditorView, basicSetup } from "codemirror";
+import { EditorState } from "@codemirror/state";
+import { markdown } from "@codemirror/lang-markdown";
+
+export const initCodemirror = (
+  node: HTMLElement,
+  ytext: Y.Text,
+  provider: WebrtcProvider
+) => {
+  const undoManager = new Y.UndoManager(ytext);
+
+  const editorState = EditorState.create({
+    doc: ytext.toString(),
+    extensions: [
+      basicSetup,
+      markdown(),
+      yCollab(ytext, provider.awareness, { undoManager }),
+      EditorView.lineWrapping,
+    ],
+  });
+
+  const editorView = new EditorView({
+    state: editorState,
+    parent: node,
+  });
+
+  return { editorView };
+};
+```
+
+That's all we need to create a text editor connected to our ytext instance. This editor will:
+
+- Bind our Yjs text to CodeMirror
+- Handle collaborative undo/redo operations
+- Manage user awareness (show user cursors and selections)
+
+## CodeMirror Action
+
+Now, we are going to use one of Svelte's awesome features, Svelte Actions, to connect a codemirror instance to a DOM node in our application. Apart from passing an `HTMLElement` to the `initCodemirror` function, this action will track the visibility of the code editor to focus it automatically when it becomes visible.
+
+```typescript
+// src/lib/editor/codemirror-action.svelte.ts
+import * as Y from "yjs";
+import { WebrtcProvider } from "y-webrtc";
+import { initCodemirror } from "../editor/initCodemirror";
+
+interface CodeMirrorOptions {
+  ytext: Y.Text;
+  provider: WebrtcProvider;
+  isVisible: boolean;
+}
+
+export const codemirror = (
+  node: HTMLElement,
+  { ytext, provider, isVisible }: CodeMirrorOptions
+) => {
+  let isVisibleState = $state(isVisible);
+
+  const { editorView } = initCodemirror(node, ytext, provider);
+
+  $effect(() => {
+    if (isVisibleState && editorView) {
+      editorView.focus();
+    }
+  });
+
+  return {
+    update(options: CodeMirrorOptions) {
+      isVisibleState = options.isVisible;
+    },
+    destroy: () => {
+      editorView.destroy();
+    },
+  };
+};
+```
+
+This Svelte Action, can now be bound to any DOM element using `use:codemirror`.
+
+## Editor Component
+
+Next step is to combine all what we did inside the most important component: `Editor.svelte`.
+
+```svelte
+<!-- src/lib/components/Editor.svelte -->
+<script lang="ts">
+	import { codemirror } from '$lib/editor/codemirror-action.svelte';
+	import type { WebrtcProvider } from 'y-webrtc';
+	import * as Y from 'yjs';
+
+	let { provider, ytext, isVisible } = $props<{
+		provider: WebrtcProvider;
+		ytext: Y.Text;
+		isVisible: boolean;
+	}>();
+</script>
+
+<div class="relative h-full w-full overflow-hidden" class:hidden={!isVisible}>
+	<div use:codemirror={{ provider, ytext, isVisible }} class="h-full focus:outline-none" />
+</div>
+```
+
+## Preview Component
+
+Now, let's create a Preview component that will render the markdown content:
+
+```svelte
+<!-- src/lib/components/Preview.svelte -->
+<script lang="ts">
+	import { marked } from 'marked';
+	import * as Y from 'yjs';
+
+	let { ytext, isVisible } = $props<{ ytext: Y.Text; isVisible: boolean }>();
+
+	const markedAction = (node: HTMLElement) => {
+		ytext.observe(() => {
+			node.innerHTML = marked
+				.use({
+					gfm: true,
+					breaks: true
+				})
+				.parse(ytext.toString()) as string;
+		});
+	};
+</script>
+
+<div class="bg-card relative h-full w-full overflow-hidden rounded" class:hidden={!isVisible}>
+	<div
+		use:markedAction
+		class="prose dark:prose-invert h-full min-w-full overflow-auto px-8 py-6 break-words"
+	></div>
+</div>
+```
+
+## User Awareness
+
+Cool, we have all the basic pieces for our collaborative editor. But, collaboration UX wouldn't be complete without user awareness. We want to see who is editing the same document and know where in the document they are.
+
+For that, we will first need to manage the connected user data. We will track it's name and a color, so they have a unique identifier within the document.
+
+We will take advantage of the awesome Svelte runes reactivity system for this. Using the `$state` rune, we will create a reactive JS class that will store the user's name and color. Also, to persist the state across browser refreshes, we will sync this state to the browser's local storage using an `$effect` rune.
+
+```typescript
+// src/lib/stores/active-user.svelte.ts
+import { browser } from "$app/environment";
+import { ACTIVE_USER_KEY } from "$lib/constants";
+import type { User } from "$lib/types";
+import randomColor from "randomcolor";
+import type { WebrtcProvider } from "y-webrtc";
+
+export class ActiveUser {
+  activeUser = $state<User>({
+    name: "",
+    color: "",
+  });
+
+  constructor(username: string = "Anonymous", provider: WebrtcProvider) {
+    this.activeUser = {
+      name: username,
+      color: randomColor(),
+    };
+
+    if (browser) {
+      const item = localStorage.getItem(ACTIVE_USER_KEY);
+      if (item) this.activeUser = this.deserialize(item);
+    }
+
+    $effect(() => {
+      localStorage.setItem(ACTIVE_USER_KEY, this.serialize(this.activeUser));
+      provider.awareness.setLocalStateField("user", {
+        name: this.activeUser.name,
+        color: this.activeUser.color,
+      });
+    });
+  }
+}
+```
+
+## Profile Component
+
+Now, we need a component where the connected user can edit it's name and color.
+
+```svelte
+<!-- src/lib/components/Profile.svelte -->
+<script lang="ts">
+	import type { ActiveUser } from '$lib/stores/active-user.svelte';
+
+	let { activeUser = $bindable() } = $props<{ activeUser: ActiveUser }>();
+</script>
+
+<div class="flex flex-col gap-4">
+	<div class="flex items-center gap-2 px-3 py-2 text-sm border rounded hover:bg-gray-100 dark:hover:bg-gray-800">
+		<div
+			class="border-foreground h-3 w-3 rounded-full border"
+			style:background-color={activeUser.activeUser.color}
+		></div>
+		<span>{activeUser.activeUser.name}</span>
+	</div>
+
+	<div class="flex flex-col gap-4 py-4">
+		<div class="grid grid-cols-5 items-center gap-4">
+			<label for="name" class="text-right text-sm font-medium">Name</label>
+			<input
+				id="name"
+				bind:value={activeUser.activeUser.name}
+				placeholder="Enter your name"
+				class="col-span-4 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+			/>
+		</div>
+		<div class="grid grid-cols-5 items-center gap-4">
+			<label for="color" class="text-right text-sm font-medium">Color</label>
+			<div class="col-span-4 flex items-center gap-2">
+				<input
+					type="color"
+					id="color"
+					bind:value={activeUser.activeUser.color}
+					class="h-8 w-8 cursor-pointer rounded"
+				/>
+				<span class="font-mono text-sm">{activeUser.activeUser.color}</span>
+			</div>
+		</div>
+	</div>
+```
+
+## Connected Users Component
+
+Now that we have a way for tracking and editing the data of each client, we need a way to share the data of all connected users across the document. For this purpouse, we will create another reactive class that connects to the Yjs provider and saves it in a Svelte `$state`
+
+```typescript
+// src/lib/stores/connected-users.svelte.ts
+import type { User } from "$lib/types";
+import type { WebrtcProvider } from "y-webrtc";
+
+export class ConnectedUsers {
+  users = $state<User[]>([]);
+
+  constructor(provider: WebrtcProvider) {
+    provider.awareness.on("change", () => {
+      const stateMap = provider.awareness.getStates() as Map<
+        number,
+        { [clientId: string]: User }
+      >;
+      const userSet = new Set<User>();
+
+      stateMap.forEach((state, clientId) => {
+        if (clientId !== provider.awareness.clientID && state.user) {
+          userSet.add(state.user);
+        }
+      });
+
+      this.users.length = 0;
+      Array.from(userSet).forEach(user => {
+        this.users.push(user);
+      });
+    });
+  }
+}
+```
+
+Next, we need a component to show the this connected users data:
+
+```svelte
+<!-- src/lib/components/ConnectedUsers.svelte -->
+<script lang="ts">
+	import type { ActiveUser } from '$lib/stores/active-user.svelte';
+	import { ConnectedUsers } from '$lib/stores/connected-users.svelte';
+	import type { WebrtcProvider } from 'y-webrtc';
+	import { slide } from 'svelte/transition';
+
+	let { provider } = $props<{ provider?: WebrtcProvider; activeUser: ActiveUser }>();
+
+	const connectedUsers = new ConnectedUsers(provider);
+</script>
+
+<div class="text-xs">
+	<h3 class="m-0 mb-2 font-medium">Connected Users</h3>
+
+	<div class="flex flex-row flex-wrap gap-2">
+		{#if connectedUsers.users.length === 0}
+			<div class="text-muted-foreground/60">No users connected</div>
+		{:else}
+			{#each connectedUsers.users as user (user.name)}
+				<div
+					class="bg-muted border-border flex items-center gap-2 rounded border px-2 py-1"
+					style="--user-color: {user.color}"
+					transition:slide={{ duration: 150 }}
+				>
+					<div class="size-3 rounded-full border" style="background-color: var(--user-color)"></div>
+					<span>{user.name}</span>
+				</div>
+			{/each}
+		{/if}
+	</div>
+</div>
+```
+
+## Document Page Implementation
+
+Now the best part: we will join all of what we've built so far in a SvelteKit route.
+
+```svelte
+<!-- src/routes/[id]/+page.svelte -->
+<script lang="ts">
+	import { onDestroy, onMount } from 'svelte';
+	import { initYjs } from '$lib/editor/initYjs';
+	import Editor from '$lib/components/Editor.svelte';
+	import { ActiveUser } from '$lib/stores/active-user.svelte';
+	import ConnectedUsers from '$lib/components/ConnectedUsers.svelte';
+	import Preview from '$lib/components/Preview.svelte';
+	import { page } from '$app/stores';
+
+	const { ydoc, provider, ytext, cleanup } = initYjs(page.params.id);
+	const activeUser = new ActiveUser('Anonymous', provider);
+
+	onDestroy(() => {
+		cleanup();
+	});
+</script>
+
+<div class="grid grid-cols-[1fr_auto] gap-4">
+	<Editor {provider} {ytext} isVisible={true} />
+	<Preview {ytext} isVisible={true} />
+</div>
+<ConnectedUsers {provider} {activeUser} />
+<Profile {activeUser} />
+```
+
+Access this page by going to `/[id]` route and your collaborative editor should be up and running.
+
+## How It All Works Together
+
+When users collaborate:
+
+1. Each user's browser creates a Yjs document with the same ID
+2. The WebRTC provider connects peers through the signaling server
+3. Changes flow through the following process:
+   - Local edits update the Yjs document
+   - Changes automatically sync to other peers via WebRTC
+   - y-codemirror.next updates the editor UI
+   - IndexedDB persists changes locally
+4. User awareness data (cursors, selections) flows through the webrtc provider's awareness protocol
+5. Conflicts are automatically resolved by Yjs's CRDT algorithm
+
+The magic happens in the `yCollab` extension, which handles:
+
+- Binding the editor to Yjs
+- Syncing selections and cursors
+- Managing undo/redo history
+- Handling concurrent edits
+
+## Testing Collaboration
+
+To test, you'll need a signaling server. Create a `.env` file:
+
+```text
+PUBLIC_SIGNALING_SERVER=http://localhost:4444
+```
+
+Then run the signaling server:
+
+```bash
+node ./node_modules/y-webrtc/bin/server.js
+```
+
+Now run your application:
+
+```bash
+pnpm run dev
+```
+
+And navigate to `http://localhost:5173/mysecretid` in two different browsers.
+
+Changes should sync between them!
+
+## Taking It Further
+
+Here are some of the features I've added in [md.uy](https://md.uy/) to enhance the application. Feel free to explore and contribute to the repo [here](https://github.com/mateoroldos/md.uy).
+
+### 1. Theme Support
+
+- Light and dark mode switching
+
+### 2. Import/Export
+
+- Markdown file import
+- Document export functionality
+
+### 3. Keyboard Shortcuts
+
+- Common editor commands
+- Quick preview toggle
+
+### 4. Enhanced Sharing
+
+- One-click copy of document ID
+- Share dialog with multiple options
+- Direct URL sharing
+
+## Conclusion
+
+We've built a fully functional collaborative markdown editor that works peer-to-peer with offline support. The magic of Yjs handles all the complex synchronization and conflict resolution under the hood, allowing us to focus on creating a great user experience.
+
+This project demonstrates the power of local-first software and CRDTs for creating collaborative experiences without complex backend infrastructure. The benefits are numerous: dramatically reduced server costs since data syncs directly between users, better privacy since sensitive content never leaves users' devices, offline-first capability that keeps working when internet connectivity drops, and faster real-time collaboration with lower latency between users. The same principles can be applied to various types of applications, from text editors to drawing tools, kanban boards, collaborative development environments.
+
+## Resources for Further Learning
+
+- [Yjs Documentation](https://docs.yjs.dev/)
+- [y-webrtc Documentation](https://github.com/yjs/y-webrtc)
+- [y-codemirror.next Documentation](https://github.com/yjs/y-codemirror.next)
+- [CRDT Primer](https://crdt.tech/)
+- [WebRTC Guide](https://webrtc.org/getting-started/overview)
+- [Local-First Software Principles](https://www.inkandswitch.com/local-first/)
